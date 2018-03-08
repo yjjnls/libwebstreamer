@@ -25,6 +25,9 @@ namespace libwebstreamer
 
             private:
                 static void on_rtspsrc_pad_added(GstElement *src, GstPad *src_pad, gpointer depay);
+                static gboolean on_rtspsrc_select_stream(GstElement* src, guint stream_id, GstCaps* stream_caps, gpointer rtspclient);
+                static void on_rtp_time_out(GstElement *rtpbin, guint session, guint ssrc, gpointer user_data);
+                static void on_get_new_rtpbin(GstElement *rtspsrc, GstElement *manager, gpointer user_data);
 
                 GstElement *rtspsrc_;
                 GstElement *rtpdepay_video_;

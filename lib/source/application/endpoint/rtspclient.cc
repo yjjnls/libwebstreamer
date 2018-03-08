@@ -59,7 +59,35 @@ namespace libwebstreamer
                     g_warn_if_reached();
                 }
             }
-
+            void RtspClient::on_rtp_time_out(GstElement *rtpbin, guint session, guint ssrc, gpointer user_data)
+            {
+                printf("----------on_rtp_time_out---------\n");
+            }
+            void RtspClient::on_get_new_rtpbin(GstElement *rtspsrc, GstElement *manager, gpointer user_data)
+            {
+                printf("---------------on_get_new_rtpbin---------------\n");
+                g_signal_connect(manager, "on-timeout", (GCallback)on_rtp_time_out, user_data);
+            }
+            gboolean RtspClient::on_rtspsrc_select_stream(GstElement *src, guint stream_id, GstCaps *stream_caps, gpointer rtspclient)
+            {
+                RtspClient *rtsp_client = static_cast<RtspClient *>(rtspclient);
+                GstStructure *stru = gst_caps_get_structure(stream_caps, 0);
+                std::string media_type(gst_structure_get_string(stru, "media"));
+                if (media_type == "video")
+                {
+                    if (!rtsp_client->pipeline_owner().lock()->video_encoding().empty())
+                        return TRUE;
+                }
+                if (media_type == "audio")
+                {
+                    if (!rtsp_client->pipeline_owner().lock()->audio_encoding().empty())
+                        return TRUE;
+                }
+                if (gst_structure_has_field(stru, "a-recvonly"))
+                {
+                }
+                return FALSE;
+            }
             bool RtspClient::add_to_pipeline()
             {
                 auto pipeline = pipeline_owner().lock();
@@ -86,7 +114,10 @@ namespace libwebstreamer
                     g_warn_if_fail(pipeline_owner().lock()->pipeline() != NULL);
                     gst_bin_add_many(GST_BIN(pipeline_owner().lock()->pipeline()), rtspsrc_, rtpdepay_video_, parse_video_, NULL);
                     g_signal_connect(rtspsrc_, "pad-added", (GCallback)on_rtspsrc_pad_added, this);
+                    g_signal_connect(rtspsrc_, "select-stream", (GCallback)on_rtspsrc_select_stream, this);
                     g_warn_if_fail(gst_element_link(rtpdepay_video_, parse_video_));
+
+                    // g_signal_connect(rtspsrc_, "new-manager", (GCallback)on_get_new_rtpbin, this);
                 }
                 if (!pipeline->audio_encoding().empty())
                 {
