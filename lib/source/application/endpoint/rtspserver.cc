@@ -103,7 +103,7 @@ namespace libwebstreamer
                 {
                     launch += "rtp" + video_encoding + "pay pt=96 name=pay0";
                     if (!audio_encoding.empty())
-                        launch += " ! rtp" + audio_encoding + "pay pt=97 name=pay1";
+                        launch += "  rtp" + audio_encoding + "pay pt=97 name=pay1";
                 }
                 else
                 {

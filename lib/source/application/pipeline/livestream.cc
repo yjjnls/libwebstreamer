@@ -95,6 +95,11 @@ namespace libwebstreamer
                             GstElement *rtppcmadepay = gst_bin_get_by_name_recurse_up(GST_BIN(pipeline()), "audio-depay");
                             g_warn_if_fail(rtppcmadepay);
                             g_warn_if_fail(gst_element_link(rtppcmadepay, audio_tee_));
+                            // GstElement *decodec = gst_element_factory_make("alawdec", "alawdec");
+                            // GstElement *sink = gst_element_factory_make("autoaudiosink", "autoaudiosink");
+                            // gst_bin_add_many(GST_BIN(pipeline()), decodec, sink, NULL);
+                            // g_warn_if_fail(gst_element_link(rtppcmadepay, decodec));
+                            // g_warn_if_fail(gst_element_link(decodec, sink));
 #endif
                         }
                     }
