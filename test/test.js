@@ -101,7 +101,7 @@ async function test() {
     try {
         await Initialize(options);
         console.log('plugin version: ' + plugin.version());
-        await create_livestream('rtsp://127.0.0.1:8553/source');
+        await create_livestream('rtsp://172.16.66.65/id=1');
         await add_viewer(rtsp_viewer);
         // await remove_viewer('endpoint2');
         // await remove_viewer('endpoint1');
@@ -110,7 +110,7 @@ async function test() {
     } catch (e) {
         console.log('-----------------error----------------');
         console.error(e.message);
-        await Terminate();
+        // await Terminate();
     }
 }
 

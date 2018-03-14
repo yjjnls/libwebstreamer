@@ -1,4 +1,5 @@
 #include <application/endpoint/rtspclient.hpp>
+#include <gst/gst.h>
 
 namespace libwebstreamer
 {
@@ -24,7 +25,16 @@ namespace libwebstreamer
                 //              "port-range", webstreamer::configuration::to_string(port_range), NULL);
                 g_object_set(G_OBJECT(rtspsrc_), "location", url.c_str(), NULL);
             }
-
+            static GstPadProbeReturn cb_have_data(GstPad *pad,
+                                                  GstPadProbeInfo *info,
+                                                  gpointer user_data)
+            {
+                static int count = 0;
+                // printf("-----data: %d------\n", count++);
+                // printf("-----    %d   ------\n", count++);
+                printf(".");
+                return GST_PAD_PROBE_OK;
+            }
             void RtspClient::on_rtspsrc_pad_added(GstElement *src, GstPad *src_pad, gpointer rtspclient)
             {
                 RtspClient *rtsp_client = static_cast<RtspClient *>(rtspclient);
@@ -42,6 +52,7 @@ namespace libwebstreamer
                         GstPadLinkReturn ret = gst_pad_link(src_pad, sink_pad);
                         g_warn_if_fail(ret == GST_PAD_LINK_OK);
                         gst_object_unref(sink_pad);
+                        // gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, cb_have_data, NULL, NULL);
                     }
                 }
                 else if (g_str_equal(g_value_get_string(media_type), "audio"))
@@ -52,6 +63,7 @@ namespace libwebstreamer
                         GstPadLinkReturn ret = gst_pad_link(src_pad, sink_pad);
                         g_warn_if_fail(ret == GST_PAD_LINK_OK);
                         gst_object_unref(sink_pad);
+                        gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, cb_have_data, NULL, NULL);
                     }
                 }
                 else

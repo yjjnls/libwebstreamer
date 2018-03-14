@@ -39,7 +39,7 @@ namespace libwebstreamer
             // for (int i = 0; i < endpoints_.size(); i++)
             // {
             //     g_assert(endpoints_[i].unique());
-            //     // on_remove_endpoint(endpoints_[i]);
+            //     on_remove_endpoint(endpoints_[i]);
             // }
             // endpoints_.erase(endpoints_.begin(), endpoints_.end());
 
@@ -89,57 +89,5 @@ namespace libwebstreamer
             printf("-------endpoints left: %d----\n", endpoints_.size());
             return true;
         }
-
-        // void Pipeline::subscribe(const webstreamer::transport::webrtctopics::Endpoint &endpoint, int topics, const std::string &signalling_bridge, const std::string &notification_address)
-        // {
-        //     webstreamer::transport::webrtctopics::subscribe(endpoint, topics, signalling_bridge, notification_address, webstreamer::on_http_notification);
-        // }
-        // void Pipeline::unsubscribe(const webstreamer::transport::webrtctopics::Endpoint &endpoint, int topics, const std::string &signalling_bridge, const std::string &notification_address)
-        // {
-        //     webstreamer::transport::webrtctopics::unsubscribe(endpoint, topics, signalling_bridge, notification_address);
-        // }
-        // void Pipeline::push(const webstreamer::transport::webrtctopics::Endpoint &endpoint, const std::string &signalling_bridge, const std::map<webstreamer::transport::webrtctopics::Topic, std::string> &topics)
-        // {
-        //     webstreamer::transport::webrtctopics::push(endpoint, signalling_bridge, topics);
-        // }
     }
 }
-
-// //------------------------------------------------------------
-// #include <webstreamer/utility/pipejoint.hpp>
-// #include "../gstutility/gst_rtsp_server.h"
-// namespace webstreamer {
-// 	namespace pipeline {
-// 		static void on_rtsp_media_constructed(GstRTSPMediaFactory *factory, GstRTSPMedia *media, gpointer user_data);
-
-// 		void rtsp_server_new_rtsp_endpoint(const std::string& url, webstreamer::pipeline::Pipeline &pipeline)
-// 		{
-// 			GstRTSPServer *rtsp_server = gst_rtsp_server();
-// 			GstRTSPMountPoints *mount_points = gst_rtsp_server_get_mount_points(rtsp_server);
-
-// 			GstRTSPMediaFactory *factory = gst_rtsp_media_factory_new();
-// 			gst_rtsp_media_factory_set_shared(factory, TRUE);
-// 			gst_rtsp_media_factory_set_launch(factory, "( rtph264pay pt=96 name=pay0 )");
-
-// 			g_signal_connect(factory, "media-constructed", (GCallback)on_rtsp_media_constructed, &pipeline);
-
-// 			gst_rtsp_mount_points_add_factory(mount_points, url.c_str(), factory);
-// 			g_object_unref(mount_points);
-// 		}
-
-// 		void on_rtsp_media_constructed(GstRTSPMediaFactory *factory, GstRTSPMedia *media, gpointer user_data)
-// 		{
-// 			webstreamer::pipeline::Pipeline* pipeline = static_cast<webstreamer::pipeline::Pipeline*>(user_data);
-// 			std::string media_type = "video";
-// 			PipeJoint pipejoint = make_pipe_joint(media_type,"rtspserver_endpoint_joint");
-
-// 			GstElement *rtsp_server_media_bin = gst_rtsp_media_get_element(media);
-// 			g_warn_if_fail(gst_bin_add(GST_BIN(rtsp_server_media_bin), pipejoint.downstream_joint));
-
-// 			GstElement *pay = gst_bin_get_by_name_recurse_up(GST_BIN(rtsp_server_media_bin), "pay0");
-// 			g_warn_if_fail(gst_element_link(pipejoint.downstream_joint, pay));
-
-// 			pipeline->add_pipe_joint(pipejoint.upstream_joint);
-// 		}
-// 	}
-// }

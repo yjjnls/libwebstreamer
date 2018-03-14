@@ -1,7 +1,6 @@
 #ifndef LIBWEBSTREAMER_FRAMEWORK_PIPELINE_HPP
 #define LIBWEBSTREAMER_FRAMEWORK_PIPELINE_HPP
 
-// #include <message/common.hpp>
 #include <framework/endpoint.hpp>
 namespace libwebstreamer
 {
@@ -11,13 +10,15 @@ namespace libwebstreamer
         {
         public:
             Pipeline(const std::string &id);
-            ~Pipeline();
+            virtual ~Pipeline();
 
             bool add_endpoint(const std::shared_ptr<Endpoint> endpoint);
             bool remove_endpoint(const std::string &endpoint_id);
             bool remove_all_endpoints();
             virtual void add_pipe_joint(GstElement *upstream_joint) = 0;
             virtual void remove_pipe_joint(GstElement *upstream_joint) = 0;
+            virtual void add_fake_sink() = 0;
+            virtual void remove_fake_sink() = 0;
 
             const std::string &id() const
             {

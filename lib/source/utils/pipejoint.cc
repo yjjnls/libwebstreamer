@@ -48,12 +48,13 @@ namespace libwebstreamer
         gst_object_unref(sink_pad);
         gst_pad_set_active(sink_bin_pad, TRUE);
         gst_element_add_pad(sink_bin, sink_bin_pad);
-        g_object_set_data(G_OBJECT(sink_bin), "media-type", (gchar *)media_type.c_str());
 
+        g_object_set_data(G_OBJECT(sink_bin), "media-type", (gchar *)media_type.c_str());
         ///-----------------
         PipeJoint pipejoint;
         pipejoint.upstream_joint = sink_bin;
         pipejoint.downstream_joint = source_bin;
+
         return pipejoint;
     }
 
