@@ -88,26 +88,26 @@ namespace libwebstreamer
                 if (g_str_equal(media_type, "video"))
                 {
                     // printf("---------video--------\n");
-                    // GstPadTemplate *templ = gst_element_class_get_pad_template(GST_ELEMENT_GET_CLASS(video_tee_), "src_%u");
-                    // GstPad *pad = gst_element_request_pad(video_tee_, templ, NULL, NULL);
-                    // sink_link *info = new sink_link(pad, upstream_joint, this);
-                    // info->video_probe_invoke_control = TRUE;
-                    // gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_IDLE, on_tee_pad_add_video_probe, info, NULL);
-                    // sinks_.push_back(info);
-                    g_warn_if_fail(gst_bin_add(GST_BIN(pipeline()), upstream_joint));
-                    g_warn_if_fail(gst_element_link(video_tee_, upstream_joint));
+                    GstPadTemplate *templ = gst_element_class_get_pad_template(GST_ELEMENT_GET_CLASS(video_tee_), "src_%u");
+                    GstPad *pad = gst_element_request_pad(video_tee_, templ, NULL, NULL);
+                    sink_link *info = new sink_link(pad, upstream_joint, this);
+                    info->video_probe_invoke_control = TRUE;
+                    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_IDLE, on_tee_pad_add_video_probe, info, NULL);
+                    sinks_.push_back(info);
+                    // g_warn_if_fail(gst_bin_add(GST_BIN(pipeline()), upstream_joint));
+                    // g_warn_if_fail(gst_element_link(video_tee_, upstream_joint));
                 }
                 else if (g_str_equal(media_type, "audio"))
                 {
                     // printf("---------audio--------\n");
-                    // GstPadTemplate *templ = gst_element_class_get_pad_template(GST_ELEMENT_GET_CLASS(audio_tee_), "src_%u");
-                    // GstPad *pad = gst_element_request_pad(audio_tee_, templ, NULL, NULL);
-                    // sink_link *info = new sink_link(pad, upstream_joint, this);
-                    // info->audio_probe_invoke_control = TRUE;
-                    // gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_IDLE, on_tee_pad_add_audio_probe, info, NULL);
-                    // sinks_.push_back(info);
-                    g_warn_if_fail(gst_bin_add(GST_BIN(pipeline()), upstream_joint));
-                    g_warn_if_fail(gst_element_link(audio_tee_, upstream_joint));
+                    GstPadTemplate *templ = gst_element_class_get_pad_template(GST_ELEMENT_GET_CLASS(audio_tee_), "src_%u");
+                    GstPad *pad = gst_element_request_pad(audio_tee_, templ, NULL, NULL);
+                    sink_link *info = new sink_link(pad, upstream_joint, this);
+                    info->audio_probe_invoke_control = TRUE;
+                    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_IDLE, on_tee_pad_add_audio_probe, info, NULL);
+                    sinks_.push_back(info);
+                    // g_warn_if_fail(gst_bin_add(GST_BIN(pipeline()), upstream_joint));
+                    // g_warn_if_fail(gst_element_link(audio_tee_, upstream_joint));
                 }
                 GstStateChangeReturn ret = gst_element_set_state(pipeline(), GST_STATE_PLAYING);
             }
