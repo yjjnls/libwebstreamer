@@ -17,7 +17,7 @@ namespace libwebstreamer
             bool remove_all_endpoints();
             virtual void add_pipe_joint(GstElement *upstream_joint) = 0;
             virtual void remove_pipe_joint(GstElement *upstream_joint) = 0;
-            virtual void add_fake_sink() = 0;
+            virtual void add_fake_sink(const std::string &name) = 0;
             virtual void remove_fake_sink() = 0;
 
             const std::string &id() const

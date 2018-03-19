@@ -56,13 +56,21 @@ namespace libwebstreamer
 
                 //add pipeline dynamicly
                 g_warn_if_fail(gst_bin_add(GST_BIN(pipeline->pipeline()), upstream_joint));
-                g_warn_if_fail(gst_element_link(pipeline->video_tee_, upstream_joint));
+                // g_warn_if_fail(gst_element_link(pipeline->video_tee_, upstream_joint));
+
+                gst_element_sync_state_with_parent(upstream_joint);
+
+                GstPad *sinkpad = gst_element_get_static_pad(upstream_joint, "sink");
+                gst_pad_link(pad, sinkpad);
+                gst_object_unref(sinkpad);
+                //audio todo change
+
 
                 return GST_PAD_PROBE_REMOVE;
             }
             GstPadProbeReturn LiveStream::on_tee_pad_add_audio_probe(GstPad *pad, GstPadProbeInfo *probe_info, gpointer data)
             {
-                printf("----------on_tee_pad_add_audio_probe----------\n");
+                // printf("----------on_tee_pad_add_audio_probe----------\n");
                 sink_link *info = static_cast<sink_link *>(data);
                 if (!g_atomic_int_compare_and_exchange(&info->audio_probe_invoke_control, TRUE, FALSE))
                 {
@@ -73,7 +81,7 @@ namespace libwebstreamer
                 LiveStream *pipeline = static_cast<LiveStream *>(info->pipeline);
 
                 //add pipeline dynamicly
-                printf("----------on_tee_pad_add_audio_probe1----------\n");
+                // printf("----------on_tee_pad_add_audio_probe1----------\n");
                 g_warn_if_fail(gst_bin_add(GST_BIN(pipeline->pipeline()), upstream_joint));
                 g_warn_if_fail(gst_element_link(pipeline->audio_tee_, upstream_joint));
 
@@ -87,7 +95,7 @@ namespace libwebstreamer
                 gchar *media_type = (gchar *)g_object_get_data(G_OBJECT(upstream_joint), "media-type");
                 if (g_str_equal(media_type, "video"))
                 {
-                    // printf("---------video--------\n");
+                    // // printf("---------video--------\n");
                     GstPadTemplate *templ = gst_element_class_get_pad_template(GST_ELEMENT_GET_CLASS(video_tee_), "src_%u");
                     GstPad *pad = gst_element_request_pad(video_tee_, templ, NULL, NULL);
                     sink_link *info = new sink_link(pad, upstream_joint, this);
@@ -99,7 +107,7 @@ namespace libwebstreamer
                 }
                 else if (g_str_equal(media_type, "audio"))
                 {
-                    // printf("---------audio--------\n");
+                    // // printf("---------audio--------\n");
                     GstPadTemplate *templ = gst_element_class_get_pad_template(GST_ELEMENT_GET_CLASS(audio_tee_), "src_%u");
                     GstPad *pad = gst_element_request_pad(audio_tee_, templ, NULL, NULL);
                     sink_link *info = new sink_link(pad, upstream_joint, this);
@@ -109,11 +117,15 @@ namespace libwebstreamer
                     // g_warn_if_fail(gst_bin_add(GST_BIN(pipeline()), upstream_joint));
                     // g_warn_if_fail(gst_element_link(audio_tee_, upstream_joint));
                 }
-                GstStateChangeReturn ret = gst_element_set_state(pipeline(), GST_STATE_PLAYING);
+                if (GST_STATE(pipeline()) != GST_STATE_PLAYING)
+                {
+                    // printf("\n\n\n\t\tpipeline  state not playing\n\n\n");
+                    GstStateChangeReturn ret = gst_element_set_state(pipeline(), GST_STATE_PLAYING);
+                }
             }
             GstPadProbeReturn LiveStream::on_tee_pad_remove_video_probe(GstPad *pad, GstPadProbeInfo *probe_info, gpointer data)
             {
-                printf("-------on_tee_pad_remove_video_probe------\n");
+                // printf("-------on_tee_pad_remove_video_probe------\n");
                 sink_link *info = static_cast<sink_link *>(data);
                 if (!g_atomic_int_compare_and_exchange(&info->video_probe_invoke_control, TRUE, FALSE))
                 {
@@ -124,19 +136,19 @@ namespace libwebstreamer
                 LiveStream *pipeline = static_cast<LiveStream *>(info->pipeline);
 
                 //remove pipeline dynamicly
-                printf("======-1========\n");
+                // printf("======-1========\n");
                 gst_element_unlink(pipeline->video_tee_, upstream_joint);
-                printf("======0========\n");
+                // printf("======0========\n");
                 gst_element_set_state(upstream_joint, GST_STATE_NULL);
                 g_warn_if_fail(gst_bin_remove(GST_BIN(pipeline->pipeline()), upstream_joint));
 
-                printf("======1========\n");
+                // printf("======1========\n");
                 gst_element_release_request_pad(pipeline->video_tee_, info->tee_pad);
-                printf("======2========\n");
+                // printf("======2========\n");
                 gst_object_unref(info->tee_pad);
-                printf("======3========\n");
+                // printf("======3========\n");
                 delete static_cast<sink_link *>(data);
-                printf("---------remove upstream_joint--------\n");
+                // printf("---------remove upstream_joint--------\n");
                 return GST_PAD_PROBE_REMOVE;
             }
             GstPadProbeReturn LiveStream::on_tee_pad_remove_audio_probe(GstPad *pad, GstPadProbeInfo *probe_info, gpointer data)
@@ -162,14 +174,14 @@ namespace libwebstreamer
             }
             void LiveStream::remove_pipe_joint(GstElement *upstream_joint)
             {
-                printf("---------remove_pipe_joint--------\n");
+                // printf("---------remove_pipe_joint--------\n");
                 // g_warn_if_fail(gst_bin_remove(GST_BIN(pipeline()), upstream_joint));
 
                 gchar *media_type = (gchar *)g_object_get_data(G_OBJECT(upstream_joint), "media-type");
-                printf("---------remove_pipe_joint2: %s--------\n", media_type);
+                // printf("---------remove_pipe_joint2: %s--------\n", media_type);
                 if (g_str_equal(media_type, "video"))
                 {
-                    printf("---------video release: %d--------\n", sinks_.size());
+                    // printf("---------video release: %d--------\n", sinks_.size());
                     auto it = sinks_.begin();
                     for (; it != sinks_.end(); ++it)
                     {
@@ -191,7 +203,7 @@ namespace libwebstreamer
                 }
                 else if (g_str_equal(media_type, "audio"))
                 {
-                    // printf("---------audio release--------\n");
+                    // // printf("---------audio release--------\n");
                     auto it = sinks_.begin();
                     for (; it != sinks_.end(); ++it)
                     {
@@ -211,7 +223,7 @@ namespace libwebstreamer
                     sinks_.erase(it);
                     // gst_element_unlink(audio_tee_, upstream_joint);
                 }
-                printf("---------remove_pipe_joint3--------\n");
+                // printf("---------remove_pipe_joint3--------\n");
             }
 
             bool LiveStream::on_add_endpoint(const std::shared_ptr<Endpoint> endpoint)
@@ -295,26 +307,49 @@ namespace libwebstreamer
                 }
                 return true;
             }
-            void LiveStream::add_fake_sink()
+            void LiveStream::add_fake_sink(const std::string &name)
             {
-                if (!fake_sink_added_)
+                // if (!fake_sink_added_)
+                // {
+                if (!video_encoding_.empty())
                 {
-                    if (!video_encoding_.empty())
+                    if (name == "1")
                     {
-                        fake_video_sink_ = gst_element_factory_make("fakesink", "video_sink");
-                        gst_bin_add_many(GST_BIN(pipeline()), fake_video_sink_, NULL);
-                        g_warn_if_fail(gst_element_link(video_tee_, fake_video_sink_));
-                    }
+                        GstElement *queue = gst_element_factory_make("queue", (name + "queue").c_str());
+                        GstElement *sink = gst_element_factory_make("autovideosink", (name + "video_sink").c_str());
+                        GstElement *decode = gst_element_factory_make("avdec_h264", (name + "decodec").c_str());
+                        gst_bin_add_many(GST_BIN(pipeline()), queue, decode, sink, NULL);
+                        // g_warn_if_fail(gst_element_link(queue, decode));
+                        g_warn_if_fail(gst_element_link(decode, sink));
 
-                    if (!audio_encoding_.empty())
+                        g_object_set_data(G_OBJECT(decode), "media-type", "video");
+
+                        add_pipe_joint(decode);
+                    }
+                    else
                     {
-                        fake_audio_sink_ = gst_element_factory_make("fakesink", "audio_sink");
-                        gst_bin_add_many(GST_BIN(pipeline()), fake_audio_sink_, NULL);
-                        g_warn_if_fail(gst_element_link(audio_tee_, fake_audio_sink_));
-                    }
+                        GstElement *queue = gst_element_factory_make("queue", (name + "queue").c_str());
+                        GstElement *sink = gst_element_factory_make("autovideosink", (name + "video_sink").c_str());
+                        GstElement *decode = gst_element_factory_make("avdec_h264", (name + "decodec").c_str());
+                        gst_bin_add_many(GST_BIN(pipeline()), queue, decode, sink, NULL);
+                        // g_warn_if_fail(gst_element_link(queue, decode));
+                        g_warn_if_fail(gst_element_link(decode, sink));
 
-                    fake_sink_added_ = true;
+                        g_object_set_data(G_OBJECT(decode), "media-type", "video");
+
+                        add_pipe_joint(decode);
+                    }
                 }
+
+                if (!audio_encoding_.empty())
+                {
+                    fake_audio_sink_ = gst_element_factory_make("fakesink", "audio_sink");
+                    gst_bin_add_many(GST_BIN(pipeline()), fake_audio_sink_, NULL);
+                    g_warn_if_fail(gst_element_link(audio_tee_, fake_audio_sink_));
+                }
+
+                fake_sink_added_ = true;
+                // }
                 // gst_element_set_state(pipeline(), GST_STATE_PLAYING);
             }
 

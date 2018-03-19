@@ -29,6 +29,8 @@ namespace libwebstreamer
                     return joints_;
                 }
 
+                static GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer rtspclient);
+
             private:
                 std::string path_;
                 std::vector<libwebstreamer::PipeJoint> joints_;

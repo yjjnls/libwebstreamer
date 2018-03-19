@@ -39,7 +39,6 @@ namespace libwebstreamer
 
                 return TRUE;
             }
-            bool control = true;
 
             void on_media_new_state(GstRTSPMedia *gstrtspmedia,
                                     gint state,
@@ -53,22 +52,19 @@ namespace libwebstreamer
 
                     static_cast<RtspServer *>(user_data)->remove_from_pipeline();
                 }
-            }
-            static GstPadProbeReturn cb_have_data(GstPad *pad,
-                                                  GstPadProbeInfo *info,
-                                                  gpointer user_data)
-            {
-                static int count = 0;
-                // printf("-----data: %d------\n", count++);
-                if (control)
-                    return GST_PAD_PROBE_OK;
-                else
+                if (state == GST_STATE_PLAYING)
                 {
-                    printf("-----------probe remove---------\n");
-                    control = true;
-                    return GST_PAD_PROBE_REMOVE;
+                    printf("\n\n\n\n\nplaying\n\n\n\n\n");
                 }
             }
+            GstPadProbeReturn RtspServer::cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data)
+            {
+                static int count = 0;
+                auto pipeline = static_cast<RtspServer *>(user_data)->pipeline_owner().lock();
+                printf("-%d\n", GST_STATE(pipeline->pipeline()));
+                return GST_PAD_PROBE_OK;
+            }
+
 
             void on_rtsp_media_constructed(GstRTSPMediaFactory *factory, GstRTSPMedia *media, gpointer user_data)
             {
@@ -78,13 +74,18 @@ namespace libwebstreamer
                 GstElement *rtsp_server_media_bin = gst_rtsp_media_get_element(media);
 
                 g_signal_connect(media, "new-state", (GCallback)on_media_new_state, user_data);
+                // GstClock *rtsp_server_clock = gst_rtsp_media_get_clock(media);
+                // GstClock *pipeline_clock = gst_pipeline_get_clock(GST_PIPELINE_CAST(pipeline->pipeline()));
+                // gst_rtsp_media_set_clock(media, pipeline_clock);
+                // gst_rtsp_media_take_pipeline (media,GST_PIPELINE_CAST(pipeline->pipeline()));
+
 
                 if (!pipeline->video_encoding().empty())
                 {
                     printf("--------video-------\n");
-                    static std::string media_type1 = "video";
+                    static std::string media_type = "video";
                     std::string pipejoint_name = std::string("rtspserver_video_endpoint_joint") + std::to_string(session_count);
-                    PipeJoint video_pipejoint = make_pipe_joint(media_type1, pipejoint_name);
+                    PipeJoint video_pipejoint = make_pipe_joint(media_type, pipejoint_name);
                     g_warn_if_fail(gst_bin_add(GST_BIN(rtsp_server_media_bin), video_pipejoint.downstream_joint));
 
                     GstElement *video_pay = gst_bin_get_by_name_recurse_up(GST_BIN(rtsp_server_media_bin), "pay0");
@@ -95,16 +96,16 @@ namespace libwebstreamer
                     video_pipejoint.rtsp_server_media_bin = rtsp_server_media_bin;
                     static_cast<RtspServer *>(user_data)->joints().push_back(video_pipejoint);
 
-                    // GstPad *pad = gst_element_get_static_pad(video_pipejoint.upstream_joint, "sink");
-                    // gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, cb_have_data, NULL, NULL);
+                    GstPad *pad = gst_element_get_static_pad(video_pay, "src");
+                    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, static_cast<RtspServer *>(user_data)->cb_have_data, user_data, NULL);
                 }
 
                 if (!pipeline->audio_encoding().empty())
                 {
                     printf("--------audio-------\n");
-                    static std::string media_type2 = "audio";
+                    static std::string media_type = "audio";
                     std::string pipejoint_name = std::string("rtspserver_audio_endpoint_joint") + std::to_string(session_count);
-                    PipeJoint audio_pipejoint = make_pipe_joint(media_type2, pipejoint_name);
+                    PipeJoint audio_pipejoint = make_pipe_joint(media_type, pipejoint_name);
                     g_warn_if_fail(gst_bin_add(GST_BIN(rtsp_server_media_bin), audio_pipejoint.downstream_joint));
 
                     GstElement *audio_pay = gst_bin_get_by_name_recurse_up(GST_BIN(rtsp_server_media_bin), "pay1");
@@ -152,7 +153,12 @@ namespace libwebstreamer
                 /* do session cleanup every 2 seconds */
                 g_timeout_add_seconds(2, (GSourceFunc)timeout, rtsp_server);
 
-                pipeline_owner().lock()->add_fake_sink();
+                static std::string name1("1");
+                static std::string name2("2");
+                static std::string name3("3");
+                pipeline_owner().lock()->add_fake_sink(name1);
+                // pipeline_owner().lock()->add_fake_sink(name2);
+                // pipeline_owner().lock()->add_fake_sink(name3);
 
                 return true;
             }
@@ -162,9 +168,9 @@ namespace libwebstreamer
             {
                 for (auto &it : joints_)
                 {
-                    printf("------gst_bin_remove-----\n");
+                    // printf("------gst_bin_remove-----\n");
                     g_warn_if_fail(gst_bin_remove(GST_BIN(it.rtsp_server_media_bin), it.downstream_joint));
-                    printf("------pipeline_owner().lock()->remove_pipe_joint-----\n");
+                    // printf("------pipeline_owner().lock()->remove_pipe_joint-----\n");
                     pipeline_owner().lock()->remove_pipe_joint(it.upstream_joint);
                 }
                 joints_.clear();

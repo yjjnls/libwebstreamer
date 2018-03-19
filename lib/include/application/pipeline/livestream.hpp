@@ -33,7 +33,7 @@ namespace libwebstreamer
                 ~LiveStream();
                 virtual void add_pipe_joint(GstElement *upstream_joint);
                 virtual void remove_pipe_joint(GstElement *upstream_joint);
-                virtual void add_fake_sink();
+                virtual void add_fake_sink(const std::string &name);
                 virtual void remove_fake_sink();
 
             protected:
