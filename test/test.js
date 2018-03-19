@@ -57,11 +57,17 @@ async function destroy_livestream() {
             throw new Error(err.toString());
         })
 }
-let rtsp_viewer = {
+let rtsp_viewer1 = {
     rtspurl: '/test',//necessary
     protocol: 'rtspserver',//necessary
     component: 'livestream1',//necessary
     endpoint: 'endpoint2'//necessary
+}
+let rtsp_viewer2 = {
+    rtspurl: '/test',//necessary
+    protocol: 'rtspserver',//necessary
+    component: 'livestream1',//necessary
+    endpoint: 'endpoint3'//necessary
 }
 async function add_viewer(options) {
     let buf = media.AddViewer(options);
@@ -102,7 +108,16 @@ async function test() {
         await Initialize(options);
         console.log('plugin version: ' + plugin.version());
         await create_livestream('rtsp://172.16.66.65/id=1');
-        await add_viewer(rtsp_viewer);
+        // await add_viewer(rtsp_viewer1);
+        // await add_viewer(rtsp_viewer2);
+        setTimeout(()=>{
+
+            add_viewer(rtsp_viewer1);
+        },3000);
+        // setTimeout(()=>{
+
+        //     add_viewer(rtsp_viewer2);
+        // },10000);
         // await remove_viewer('endpoint2');
         // await remove_viewer('endpoint1');
         // await destroy_livestream();

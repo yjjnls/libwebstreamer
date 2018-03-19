@@ -153,12 +153,14 @@ namespace libwebstreamer
                 /* do session cleanup every 2 seconds */
                 g_timeout_add_seconds(2, (GSourceFunc)timeout, rtsp_server);
 
-                static std::string name1("1");
-                static std::string name2("2");
-                static std::string name3("3");
-                pipeline_owner().lock()->add_fake_sink(name1);
-                // pipeline_owner().lock()->add_fake_sink(name2);
-                // pipeline_owner().lock()->add_fake_sink(name3);
+                // static std::string name1("1");
+                // static std::string name2("2");
+                // static std::string name3("3");
+                // static int k = 0;
+                // pipeline_owner().lock()->add_test_sink(name1);
+                // pipeline_owner().lock()->add_test_sink(name2);
+                
+                // pipeline_owner().lock()->add_test_sink(name3);
 
                 return true;
             }

@@ -3,6 +3,7 @@
 
 #include <framework/pipeline.hpp>
 
+// #define USE_AUTO_SINK 1
 namespace libwebstreamer
 {
     namespace application
@@ -33,7 +34,8 @@ namespace libwebstreamer
                 ~LiveStream();
                 virtual void add_pipe_joint(GstElement *upstream_joint);
                 virtual void remove_pipe_joint(GstElement *upstream_joint);
-                virtual void add_fake_sink(const std::string &name);
+
+                virtual void add_test_sink(const std::string &name);
                 virtual void remove_fake_sink();
 
             protected:
@@ -52,9 +54,16 @@ namespace libwebstreamer
 
                 std::list<sink_link *> sinks_;//all the request pad of tee, release when removing from pipeline
 
-                bool fake_sink_added_;
+                GstPad *video_tee_pad_;
+                GstElement *fake_video_queue_;
                 GstElement *fake_video_sink_;
+                GstPad *audio_tee_pad_;
+                GstElement *fake_audio_queue_;
                 GstElement *fake_audio_sink_;
+#ifdef USE_AUTO_SINK
+                GstElement *fake_video_decodec_;
+                GstElement *fake_audio_decodec_;
+#endif
             };
         }
     }

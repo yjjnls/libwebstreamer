@@ -71,15 +71,15 @@ namespace libwebstreamer
                     g_warn_if_reached();
                 }
             }
-            void RtspClient::on_rtp_time_out(GstElement *rtpbin, guint session, guint ssrc, gpointer user_data)
-            {
-                printf("----------on_rtp_time_out---------\n");
-            }
-            void RtspClient::on_get_new_rtpbin(GstElement *rtspsrc, GstElement *manager, gpointer user_data)
-            {
-                printf("---------------on_get_new_rtpbin---------------\n");
-                g_signal_connect(manager, "on-timeout", (GCallback)on_rtp_time_out, user_data);
-            }
+            // void RtspClient::on_rtp_time_out(GstElement *rtpbin, guint session, guint ssrc, gpointer user_data)
+            // {
+            //     printf("----------on_rtp_time_out---------\n");
+            // }
+            // void RtspClient::on_get_new_rtpbin(GstElement *rtspsrc, GstElement *manager, gpointer user_data)
+            // {
+            //     printf("---------------on_get_new_rtpbin---------------\n");
+            //     g_signal_connect(manager, "on-timeout", (GCallback)on_rtp_time_out, user_data);
+            // }
             gboolean RtspClient::on_rtspsrc_select_stream(GstElement *src, guint stream_id, GstCaps *stream_caps, gpointer rtspclient)
             {
                 RtspClient *rtsp_client = static_cast<RtspClient *>(rtspclient);
@@ -142,7 +142,7 @@ namespace libwebstreamer
                         case AudioEncodingType::PCMU:
                             rtpaudiodepay_ = gst_element_factory_make("rtppcmudepay", "audio-depay");
                             break;
-                        case VideoEncodingType::H265:
+                        case AudioEncodingType::OPUS:
                             rtpaudiodepay_ = gst_element_factory_make("rtpopusdepay", "audio-depay");
                             break;
                         default:
@@ -150,15 +150,8 @@ namespace libwebstreamer
                             return false;
                     }
 
-#ifdef ENABLE_AUDIO_CODEC
-                    alawdec = gst_element_factory_make("alawdec", "alawdec");
-                    g_warn_if_fail(rtpaudiodepay_ && alawdec);
-                    gst_bin_add_many(GST_BIN(pipeline_owner().lock()->pipeline()), rtpaudiodepay_, alawdec, NULL);
-                    g_warn_if_fail(gst_element_link(rtpaudiodepay_, alawdec));
-#else
                     g_warn_if_fail(rtpaudiodepay_);
                     gst_bin_add_many(GST_BIN(pipeline_owner().lock()->pipeline()), rtpaudiodepay_, NULL);
-#endif
                 }
                 return true;
             }
