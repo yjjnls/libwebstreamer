@@ -61,8 +61,7 @@ namespace libwebstreamer
                     std::shared_ptr<Pipeline> pipeline = static_cast<RtspServer *>(user_data)->pipeline_owner().lock();
 
                     auto base_time = gst_element_get_base_time(pipeline->pipeline());
-                    printf("\n~~~~~~~======  %d   =====\n", base_time);
-                    printf("\n~~~~~~~======  %d   =====\n", gst_element_get_base_time(static_cast<RtspServer *>(user_data)->pipeline_));
+                    printf("~~~~~~~======  %d   =====\n", base_time);
                     gst_element_set_base_time(static_cast<RtspServer *>(user_data)->pipeline_, base_time);
                     // gst_element_set_base_time(pipe, gst_element_get_base_time(pipeline->pipeline()));
 

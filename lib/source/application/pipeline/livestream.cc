@@ -81,11 +81,11 @@ namespace libwebstreamer
                     // g_warn_if_fail(gst_bin_add(GST_BIN(pipeline()), upstream_joint));
                     // g_warn_if_fail(gst_element_link(audio_tee_, upstream_joint));
                 }
-                if (GST_STATE(pipeline()) != GST_STATE_PLAYING)
-                {
-                    printf("\n\n\n\t\tpipeline  state not playing\n\n\n");
-                    GstStateChangeReturn ret = gst_element_set_state(pipeline(), GST_STATE_PLAYING);
-                }
+                // if (GST_STATE(pipeline()) != GST_STATE_PLAYING)
+                // {
+                //     printf("\n\n\n\t\tpipeline  state not playing\n\n\n");
+                //     GstStateChangeReturn ret = gst_element_set_state(pipeline(), GST_STATE_PLAYING);
+                // }
             }
             GstPadProbeReturn LiveStream::on_tee_pad_remove_video_probe(GstPad *teepad, GstPadProbeInfo *probe_info, gpointer data)
             {
@@ -207,23 +207,23 @@ namespace libwebstreamer
                             g_warn_if_fail(parse);
 
                             g_warn_if_fail(gst_element_link(parse, video_tee_));
-                            // fake_video_queue_ = gst_element_factory_make("queue", "fake_video_queue");
+                            fake_video_queue_ = gst_element_factory_make("queue", "fake_video_queue");
 #ifdef USE_AUTO_SINK
-                            // fake_video_decodec_ = gst_element_factory_make("avdec_h264", "fake_decodec");
-                            // fake_video_sink_ = gst_element_factory_make("autovideosink", "fake_video_sink");
-                            // gst_bin_add_many(GST_BIN(pipeline()), fake_video_decodec_, fake_video_queue_, fake_video_sink_, NULL);
-                            // gst_element_link_many(fake_video_queue_, fake_video_decodec_, fake_video_sink_, NULL);
+                            fake_video_decodec_ = gst_element_factory_make("avdec_h264", "fake_decodec");
+                            fake_video_sink_ = gst_element_factory_make("autovideosink", "fake_video_sink");
+                            gst_bin_add_many(GST_BIN(pipeline()), fake_video_decodec_, fake_video_queue_, fake_video_sink_, NULL);
+                            gst_element_link_many(fake_video_queue_, fake_video_decodec_, fake_video_sink_, NULL);
 #else
                             fake_video_sink_ = gst_element_factory_make("fakesink", "fake_video_sink");
                             g_object_set(fake_video_sink_, "sync", TRUE, NULL);
                             gst_bin_add_many(GST_BIN(pipeline()), fake_video_queue_, fake_video_sink_, NULL);
                             gst_element_link_many(fake_video_queue_, fake_video_sink_, NULL);
 #endif
-                            // GstPadTemplate *templ = gst_element_class_get_pad_template(GST_ELEMENT_GET_CLASS(video_tee_), "src_%u");
-                            // video_tee_pad_ = gst_element_request_pad(video_tee_, templ, NULL, NULL);
-                            // GstPad *sinkpad = gst_element_get_static_pad(fake_video_queue_, "sink");
-                            // g_warn_if_fail(gst_pad_link(video_tee_pad_, sinkpad) == GST_PAD_LINK_OK);
-                            // gst_object_unref(sinkpad);
+                            GstPadTemplate *templ = gst_element_class_get_pad_template(GST_ELEMENT_GET_CLASS(video_tee_), "src_%u");
+                            video_tee_pad_ = gst_element_request_pad(video_tee_, templ, NULL, NULL);
+                            GstPad *sinkpad = gst_element_get_static_pad(fake_video_queue_, "sink");
+                            g_warn_if_fail(gst_pad_link(video_tee_pad_, sinkpad) == GST_PAD_LINK_OK);
+                            gst_object_unref(sinkpad);
                         }
                         if (!audio_encoding().empty())
                         {
@@ -245,7 +245,7 @@ namespace libwebstreamer
 #endif
 #endif
                         }
-                        // gst_element_set_state(pipeline(), GST_STATE_PLAYING);
+                        gst_element_set_state(pipeline(), GST_STATE_PLAYING);
                     }
                     break;
                     case EndpointType::RTSP_SERVER:
