@@ -23,8 +23,7 @@ autocmake_msvc_project_group( _FILES ${CMAKE_CURRENT_SOURCE_DIR})
 
 autocmake_add_library(libwebstreamer  SHARED
              SOURCES ${_FILES}
-             MODULES gstreamer-rtsp-server-1.0 gstreamer-1.0 glib-2.0 json-glib-1.0 openwebrtc-lite-0.3
-			 )
+             MODULES gstreamer-rtsp-server-1.0 gstreamer-1.0 glib-2.0)
 
 target_link_libraries(libwebstreamer flatbuffers)
 link_directories(libwebstreamer ${DCMAKE_INSTALL_PREFIX}/lib)
