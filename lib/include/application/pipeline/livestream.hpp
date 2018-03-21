@@ -3,7 +3,7 @@
 
 #include <framework/pipeline.hpp>
 
-// #define USE_AUTO_SINK 1
+#define USE_AUTO_SINK 1
 namespace libwebstreamer
 {
     namespace application
@@ -37,14 +37,14 @@ namespace libwebstreamer
 
                 virtual void add_test_sink(const std::string &name);
                 virtual void remove_fake_sink();
+                static GstPadProbeReturn LiveStream::cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
+
 
             protected:
                 virtual bool on_add_endpoint(const std::shared_ptr<libwebstreamer::framework::Endpoint> endpoint);
                 virtual bool on_remove_endpoint(const std::shared_ptr<libwebstreamer::framework::Endpoint> endpoint);
                 virtual bool MessageHandler(GstMessage *msg);
 
-                static GstPadProbeReturn on_tee_pad_add_video_probe(GstPad *pad, GstPadProbeInfo *probe_info, gpointer data);
-                static GstPadProbeReturn on_tee_pad_add_audio_probe(GstPad *pad, GstPadProbeInfo *probe_info, gpointer data);
                 static GstPadProbeReturn on_tee_pad_remove_video_probe(GstPad *pad, GstPadProbeInfo *probe_info, gpointer data);
                 static GstPadProbeReturn on_tee_pad_remove_audio_probe(GstPad *pad, GstPadProbeInfo *probe_info, gpointer data);
 
@@ -64,6 +64,7 @@ namespace libwebstreamer
                 GstElement *fake_video_decodec_;
                 GstElement *fake_audio_decodec_;
 #endif
+GstElement *pipe;
             };
         }
     }

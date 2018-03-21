@@ -21,6 +21,7 @@ namespace libwebstreamer
             RtspServer::RtspServer(const std::string &id, const std::string &type,
                                    const std::shared_ptr<libwebstreamer::framework::Pipeline> pipeline_owner)
                 : libwebstreamer::framework::Endpoint(id, type, pipeline_owner)
+                , pipeline_(NULL)
             {
             }
 
@@ -39,11 +40,10 @@ namespace libwebstreamer
 
                 return TRUE;
             }
-
-            void on_media_new_state(GstRTSPMedia *gstrtspmedia,
-                                    gint state,
-                                    gpointer user_data)
+            // static GstElement *pipe = NULL;
+            void RtspServer::on_media_new_state(GstRTSPMedia *media, gint state, gpointer user_data)
             {
+                printf("~~~~~~~~state: %d~~~~~~~~~\n", state);
                 if (state == GST_STATE_NULL)
                 {
                     printf("\n~~~~~~~~    Rtsp Server: No client!   ~~~~~~~~\n");
@@ -51,22 +51,35 @@ namespace libwebstreamer
                     std::shared_ptr<Pipeline> pipeline = static_cast<RtspServer *>(user_data)->pipeline_owner().lock();
 
                     static_cast<RtspServer *>(user_data)->remove_from_pipeline();
+
+                    static_cast<RtspServer *>(user_data)->pipeline_ = NULL;
+                    // pipe = NULL;
                 }
                 if (state == GST_STATE_PLAYING)
                 {
-                    printf("\n\n\n\n\nplaying\n\n\n\n\n");
+                    typedef libwebstreamer::framework::Pipeline Pipeline;
+                    std::shared_ptr<Pipeline> pipeline = static_cast<RtspServer *>(user_data)->pipeline_owner().lock();
+
+                    auto base_time = gst_element_get_base_time(pipeline->pipeline());
+                    printf("\n~~~~~~~======  %d   =====\n", base_time);
+                    printf("\n~~~~~~~======  %d   =====\n", gst_element_get_base_time(static_cast<RtspServer *>(user_data)->pipeline_));
+                    gst_element_set_base_time(static_cast<RtspServer *>(user_data)->pipeline_, base_time);
+                    // gst_element_set_base_time(pipe, gst_element_get_base_time(pipeline->pipeline()));
+
+                    printf("\n\n\n\n\nplaying %d\n\n\n\n\n", GST_STATE(static_cast<RtspServer *>(user_data)->pipeline_));
                 }
             }
             GstPadProbeReturn RtspServer::cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data)
             {
                 static int count = 0;
+
                 auto pipeline = static_cast<RtspServer *>(user_data)->pipeline_owner().lock();
                 printf("-%d\n", GST_STATE(pipeline->pipeline()));
                 return GST_PAD_PROBE_OK;
             }
 
 
-            void on_rtsp_media_constructed(GstRTSPMediaFactory *factory, GstRTSPMedia *media, gpointer user_data)
+            void RtspServer::on_rtsp_media_constructed(GstRTSPMediaFactory *factory, GstRTSPMedia *media, gpointer user_data)
             {
                 using namespace libwebstreamer;
                 typedef libwebstreamer::framework::Pipeline Pipeline;
@@ -74,24 +87,36 @@ namespace libwebstreamer
                 GstElement *rtsp_server_media_bin = gst_rtsp_media_get_element(media);
 
                 g_signal_connect(media, "new-state", (GCallback)on_media_new_state, user_data);
-                // GstClock *rtsp_server_clock = gst_rtsp_media_get_clock(media);
-                // GstClock *pipeline_clock = gst_pipeline_get_clock(GST_PIPELINE_CAST(pipeline->pipeline()));
-                // gst_rtsp_media_set_clock(media, pipeline_clock);
-                // gst_rtsp_media_take_pipeline (media,GST_PIPELINE_CAST(pipeline->pipeline()));
+                g_warn_if_fail(!static_cast<RtspServer *>(user_data)->pipeline_);
 
+                static_cast<RtspServer *>(user_data)->pipeline_ = gst_pipeline_new("rtsp-server-test");
+                // GstClock *sys_clock = gst_system_clock_obtain();
+                // gst_pipeline_use_clock(GST_PIPELINE(static_cast<RtspServer *>(user_data)->pipeline_), sys_clock);
+                // g_object_unref(sys_clock);
+                gst_rtsp_media_take_pipeline(media, GST_PIPELINE_CAST(static_cast<RtspServer *>(user_data)->pipeline_));
 
+                // gst_rtsp_media_take_pipeline(media, GST_PIPELINE_CAST(pipeline->pipeline()));
+
+                // pipe = gst_pipeline_new("rtsp-server-test");
+                // gst_rtsp_media_take_pipeline(media, GST_PIPELINE(pipe));
+
+                // static std::string name2("2");
+                //                 pipeline->add_test_sink(name2);
                 if (!pipeline->video_encoding().empty())
                 {
                     printf("--------video-------\n");
                     static std::string media_type = "video";
                     std::string pipejoint_name = std::string("rtspserver_video_endpoint_joint") + std::to_string(session_count);
                     PipeJoint video_pipejoint = make_pipe_joint(media_type, pipejoint_name);
+
+                    pipeline->add_pipe_joint(video_pipejoint.upstream_joint);
+
                     g_warn_if_fail(gst_bin_add(GST_BIN(rtsp_server_media_bin), video_pipejoint.downstream_joint));
 
                     GstElement *video_pay = gst_bin_get_by_name_recurse_up(GST_BIN(rtsp_server_media_bin), "pay0");
                     g_warn_if_fail(gst_element_link(video_pipejoint.downstream_joint, video_pay));
 
-                    pipeline->add_pipe_joint(video_pipejoint.upstream_joint);
+
 
                     video_pipejoint.rtsp_server_media_bin = rtsp_server_media_bin;
                     static_cast<RtspServer *>(user_data)->joints().push_back(video_pipejoint);
@@ -153,13 +178,12 @@ namespace libwebstreamer
                 /* do session cleanup every 2 seconds */
                 g_timeout_add_seconds(2, (GSourceFunc)timeout, rtsp_server);
 
-                // static std::string name1("1");
-                // static std::string name2("2");
-                // static std::string name3("3");
-                // static int k = 0;
+                static std::string name1("1");
+                static std::string name2("2");
+                static std::string name3("3");
+                static int k = 0;
                 // pipeline_owner().lock()->add_test_sink(name1);
                 // pipeline_owner().lock()->add_test_sink(name2);
-                
                 // pipeline_owner().lock()->add_test_sink(name3);
 
                 return true;
@@ -170,9 +194,7 @@ namespace libwebstreamer
             {
                 for (auto &it : joints_)
                 {
-                    // printf("------gst_bin_remove-----\n");
                     g_warn_if_fail(gst_bin_remove(GST_BIN(it.rtsp_server_media_bin), it.downstream_joint));
-                    // printf("------pipeline_owner().lock()->remove_pipe_joint-----\n");
                     pipeline_owner().lock()->remove_pipe_joint(it.upstream_joint);
                 }
                 joints_.clear();

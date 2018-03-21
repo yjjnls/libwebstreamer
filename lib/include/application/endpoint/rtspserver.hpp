@@ -28,12 +28,15 @@ namespace libwebstreamer
                 {
                     return joints_;
                 }
-
+                static void on_rtsp_media_constructed(GstRTSPMediaFactory *factory, GstRTSPMedia *media, gpointer user_data);
+                static void on_media_new_state(GstRTSPMedia *media, gint state, gpointer user_data);
+                //todo del
                 static GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer rtspclient);
 
             private:
                 std::string path_;
                 std::vector<libwebstreamer::PipeJoint> joints_;
+                GstElement *pipeline_;
             };
 
             GstRTSPServer *get_rtsp_server();

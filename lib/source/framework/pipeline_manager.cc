@@ -97,6 +97,11 @@ namespace libwebstreamer
                     return;
                 }
             }
+            // // set pipeline sysclock
+            // GstClock *sys_clock = gst_system_clock_obtain();
+            // gst_pipeline_use_clock(GST_PIPELINE(livestream->pipeline()), sys_clock);
+            // g_object_unref(sys_clock);
+
             // set rtsp source url
             std::string endpoint_url(endpoint->url()->c_str());
 

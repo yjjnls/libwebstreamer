@@ -30,8 +30,7 @@ namespace libwebstreamer
                 static int count = 0;
                 RtspClient *rtsp_client = static_cast<RtspClient *>(rtspclient);
                 auto pipeline = rtsp_client->pipeline_owner().lock();
-                // printf("-----data: %d------\n", count++);
-                // printf("-----    %d   ------\n", count++);
+                
                 printf(".%d", GST_STATE(pipeline->pipeline()));
                 return GST_PAD_PROBE_OK;
             }
