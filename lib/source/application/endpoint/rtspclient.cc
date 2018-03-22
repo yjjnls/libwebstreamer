@@ -32,7 +32,7 @@ namespace libwebstreamer
                 auto pipeline = rtsp_client->pipeline_owner().lock();
 
                 // printf(".%d", GST_STATE(pipeline->pipeline()));
-                // printf(".");
+                printf(".");
                 return GST_PAD_PROBE_OK;
             }
             void RtspClient::on_rtspsrc_pad_added(GstElement *src, GstPad *src_pad, gpointer rtspclient)
@@ -52,7 +52,7 @@ namespace libwebstreamer
                         GstPadLinkReturn ret = gst_pad_link(src_pad, sink_pad);
                         g_warn_if_fail(ret == GST_PAD_LINK_OK);
                         gst_object_unref(sink_pad);
-                        gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, on_monitor_data, rtspclient, NULL);
+                        // gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, on_monitor_data, rtspclient, NULL);
                     }
                 }
                 else if (g_str_equal(g_value_get_string(media_type), "audio"))
@@ -63,7 +63,7 @@ namespace libwebstreamer
                         GstPadLinkReturn ret = gst_pad_link(src_pad, sink_pad);
                         g_warn_if_fail(ret == GST_PAD_LINK_OK);
                         gst_object_unref(sink_pad);
-                        // gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, on_monitor_data, NULL, NULL);
+                        gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, on_monitor_data, rtspclient, NULL);
                     }
                 }
                 else
@@ -103,6 +103,14 @@ namespace libwebstreamer
             bool RtspClient::add_to_pipeline()
             {
                 auto pipeline = pipeline_owner().lock();
+                static int added = 0;
+                if (added++ == 0)
+                {
+                    gst_bin_add(GST_BIN(pipeline_owner().lock()->pipeline()), rtspsrc_);
+                    g_signal_connect(rtspsrc_, "pad-added", (GCallback)on_rtspsrc_pad_added, this);
+                    g_signal_connect(rtspsrc_, "select-stream", (GCallback)on_rtspsrc_select_stream, this);
+                }
+
                 if (!pipeline->video_encoding().empty())
                 {
                     VideoEncodingType video_codec = get_video_encoding_type(pipeline->video_encoding());
@@ -124,9 +132,7 @@ namespace libwebstreamer
 
                     g_warn_if_fail(pipeline_owner().lock() != NULL);
                     g_warn_if_fail(pipeline_owner().lock()->pipeline() != NULL);
-                    gst_bin_add_many(GST_BIN(pipeline_owner().lock()->pipeline()), rtspsrc_, rtpdepay_video_, parse_video_, NULL);
-                    g_signal_connect(rtspsrc_, "pad-added", (GCallback)on_rtspsrc_pad_added, this);
-                    g_signal_connect(rtspsrc_, "select-stream", (GCallback)on_rtspsrc_select_stream, this);
+                    gst_bin_add_many(GST_BIN(pipeline_owner().lock()->pipeline()), rtpdepay_video_, parse_video_, NULL);
                     g_warn_if_fail(gst_element_link(rtpdepay_video_, parse_video_));
 
                     // g_signal_connect(rtspsrc_, "new-manager", (GCallback)on_get_new_rtpbin, this);
@@ -153,6 +159,7 @@ namespace libwebstreamer
                     g_warn_if_fail(rtpaudiodepay_);
                     gst_bin_add_many(GST_BIN(pipeline_owner().lock()->pipeline()), rtpaudiodepay_, NULL);
                 }
+
                 return true;
             }
 
