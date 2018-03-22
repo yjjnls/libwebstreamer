@@ -6,6 +6,7 @@ namespace libwebstreamer
 {
     std::map<std::string, EndpointType> endpoint_type = {{"rtspclient", EndpointType::RTSP_CLIENT},
                                                          {"rtspserver", EndpointType::RTSP_SERVER},
+                                                         {"testsink", EndpointType::TEST_SINK},
                                                          {"webrtc", EndpointType::WEBRTC}};
     EndpointType get_endpoint_type(const std::string &type)
     {

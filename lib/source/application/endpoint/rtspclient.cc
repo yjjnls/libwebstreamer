@@ -25,13 +25,14 @@ namespace libwebstreamer
                 //              "port-range", webstreamer::configuration::to_string(port_range), NULL);
                 g_object_set(G_OBJECT(rtspsrc_), "location", url.c_str(), NULL);
             }
-            GstPadProbeReturn RtspClient::cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer rtspclient)
+            GstPadProbeReturn RtspClient::on_monitor_data(GstPad *pad, GstPadProbeInfo *info, gpointer rtspclient)
             {
                 static int count = 0;
                 RtspClient *rtsp_client = static_cast<RtspClient *>(rtspclient);
                 auto pipeline = rtsp_client->pipeline_owner().lock();
-                
-                printf(".%d", GST_STATE(pipeline->pipeline()));
+
+                // printf(".%d", GST_STATE(pipeline->pipeline()));
+                // printf(".");
                 return GST_PAD_PROBE_OK;
             }
             void RtspClient::on_rtspsrc_pad_added(GstElement *src, GstPad *src_pad, gpointer rtspclient)
@@ -51,7 +52,7 @@ namespace libwebstreamer
                         GstPadLinkReturn ret = gst_pad_link(src_pad, sink_pad);
                         g_warn_if_fail(ret == GST_PAD_LINK_OK);
                         gst_object_unref(sink_pad);
-                        gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, cb_have_data, rtspclient, NULL);
+                        gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, on_monitor_data, rtspclient, NULL);
                     }
                 }
                 else if (g_str_equal(g_value_get_string(media_type), "audio"))
@@ -62,7 +63,7 @@ namespace libwebstreamer
                         GstPadLinkReturn ret = gst_pad_link(src_pad, sink_pad);
                         g_warn_if_fail(ret == GST_PAD_LINK_OK);
                         gst_object_unref(sink_pad);
-                        // gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, cb_have_data, NULL, NULL);
+                        // gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, on_monitor_data, NULL, NULL);
                     }
                 }
                 else

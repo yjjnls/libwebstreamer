@@ -69,6 +69,12 @@ let rtsp_viewer2 = {
     component: 'livestream1',//necessary
     endpoint: 'endpoint3'//necessary
 }
+let test_viewer1 = {
+    rtspurl: '/xxx',//necessary
+    protocol: 'testsink',//necessary
+    component: 'livestream1',//necessary
+    endpoint: 'endpoint4'//necessary
+}
 async function add_viewer(options) {
     let buf = media.AddViewer(options);
     await plugin.call(buf)
@@ -110,10 +116,15 @@ async function test() {
         await create_livestream('rtsp://172.16.66.65/id=1');
         // await add_viewer(rtsp_viewer1);
         // await add_viewer(rtsp_viewer2);
-        setTimeout(()=>{
+        setInterval(() => {
 
-            add_viewer(rtsp_viewer1);
-        },3000);
+            add_viewer(test_viewer1);
+            setTimeout(() => {
+
+                remove_viewer('endpoint4');
+            }, 3000);
+        }, 6000);
+
         // setTimeout(()=>{
 
         //     add_viewer(rtsp_viewer2);

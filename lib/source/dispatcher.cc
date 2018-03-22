@@ -1,5 +1,5 @@
 // #include <owr/owr.h>
-#include <json-glib/json-glib.h>
+// #include <json-glib/json-glib.h>
 #include <memory>
 #include <glib.h>
 #include <dispatcher.hpp>
@@ -16,27 +16,27 @@ namespace libwebstreamer
     static gboolean on_pipeline_manager_dispatch(gpointer pipeline_manager);
 
     static guint rtsp_server_source_id = 0;
-    static GMainLoop *owr_main_loop = NULL;
+    static GMainLoop *gst_main_loop = NULL;
 
-    static gboolean owr_running_callback(GAsyncQueue *msg_queue)
+    static gboolean gst_running_callback(GAsyncQueue *msg_queue)
     {
         g_return_val_if_fail(msg_queue, FALSE);
         g_async_queue_push(msg_queue, "ready");
         return G_SOURCE_REMOVE;
     }
-    void owr_run(void)
+    void gst_run(void)
     {
         GMainLoop *main_loop;
 
         g_return_if_fail(libwebstreamer_main_context);
-        g_return_if_fail(!owr_main_loop);
+        g_return_if_fail(!gst_main_loop);
 
         main_loop = g_main_loop_new(libwebstreamer_main_context, FALSE);
-        owr_main_loop = main_loop;
+        gst_main_loop = main_loop;
         g_main_loop_run(main_loop);
         g_main_loop_unref(main_loop);
     }
-    static gpointer owr_run_thread_func(GAsyncQueue *msg_queue)
+    static gpointer gst_run_thread_func(GAsyncQueue *msg_queue)
     {
         GSource *idle_source;
 
@@ -44,41 +44,41 @@ namespace libwebstreamer
         g_return_val_if_fail(libwebstreamer_main_context, NULL);
 
         idle_source = g_idle_source_new();
-        g_source_set_callback(idle_source, (GSourceFunc)owr_running_callback, msg_queue, NULL);
+        g_source_set_callback(idle_source, (GSourceFunc)gst_running_callback, msg_queue, NULL);
         g_source_set_priority(idle_source, G_PRIORITY_DEFAULT);
         g_source_attach(idle_source, libwebstreamer_main_context);
         msg_queue = NULL;
 
-        owr_run();
+        gst_run();
         return NULL;
     }
 
-    void owr_run_in_background(void)
+    void gst_run_in_background(void)
     {
-        GThread *owr_main_thread;
+        GThread *gst_main_thread;
         GAsyncQueue *msg_queue = g_async_queue_new();
 
         g_return_if_fail(libwebstreamer_main_context);
-        g_return_if_fail(!owr_main_loop);
+        g_return_if_fail(!gst_main_loop);
 
-        owr_main_thread = g_thread_new("owr_main_loop", (GThreadFunc)owr_run_thread_func, msg_queue);
-        g_thread_unref(owr_main_thread);
+        gst_main_thread = g_thread_new("gst_main_loop", (GThreadFunc)gst_run_thread_func, msg_queue);
+        g_thread_unref(gst_main_thread);
         g_async_queue_pop(msg_queue);
         g_async_queue_unref(msg_queue);
     }
-    void owr_quit(void)
+    void gst_quit(void)
     {
-        g_return_if_fail(owr_main_loop);
-        g_main_loop_quit(owr_main_loop);
-        owr_main_loop = NULL;
+        g_return_if_fail(gst_main_loop);
+        g_main_loop_quit(gst_main_loop);
+        gst_main_loop = NULL;
     }
     //-------------------------------------------------------------//
     void initialize()
     {
         libwebstreamer_main_context = g_main_context_ref_thread_default();
-        // owr_init(libwebstreamer_main_context);
+        // gst_init(libwebstreamer_main_context);
         gst_init(NULL, NULL);
-        owr_run_in_background();
+        gst_run_in_background();
 
         GstRTSPServer *rtsp_server = libwebstreamer::application::endpoint::get_rtsp_server();
         rtsp_server_source_id = gst_rtsp_server_attach(rtsp_server, libwebstreamer_main_context);
@@ -90,7 +90,7 @@ namespace libwebstreamer
         g_warn_if_fail(g_source_remove(rtsp_server_source_id));
         g_object_unref(rtsp_server);
 
-        owr_quit();
+        gst_quit();
     }
 
     void dispatch(GSourceFunc callback, gpointer user_data)

@@ -35,20 +35,16 @@ namespace libwebstreamer
                 virtual void add_pipe_joint(GstElement *upstream_joint);
                 virtual void remove_pipe_joint(GstElement *upstream_joint);
 
-                virtual void add_test_sink(const std::string &name);
-                virtual void remove_fake_sink();
-                static GstPadProbeReturn LiveStream::cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
-
-
             protected:
                 virtual bool on_add_endpoint(const std::shared_ptr<libwebstreamer::framework::Endpoint> endpoint);
                 virtual bool on_remove_endpoint(const std::shared_ptr<libwebstreamer::framework::Endpoint> endpoint);
                 virtual bool MessageHandler(GstMessage *msg);
 
-                static GstPadProbeReturn on_tee_pad_remove_video_probe(GstPad *pad, GstPadProbeInfo *probe_info, gpointer data);
-                static GstPadProbeReturn on_tee_pad_remove_audio_probe(GstPad *pad, GstPadProbeInfo *probe_info, gpointer data);
 
             private:
+                static GstPadProbeReturn on_tee_pad_remove_video_probe(GstPad *pad, GstPadProbeInfo *probe_info, gpointer data);
+                static GstPadProbeReturn on_tee_pad_remove_audio_probe(GstPad *pad, GstPadProbeInfo *probe_info, gpointer data);
+                static GstPadProbeReturn on_monitor_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
                 GstElement *video_tee_;
                 GstElement *audio_tee_;
 
@@ -64,7 +60,8 @@ namespace libwebstreamer
                 GstElement *fake_video_decodec_;
                 GstElement *fake_audio_decodec_;
 #endif
-GstElement *pipe;
+                //to del
+                GstElement *pipe;
             };
         }
     }

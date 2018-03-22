@@ -1,6 +1,7 @@
 #include <framework/endpoint.hpp>
 #include <application/endpoint/rtspclient.hpp>
 #include <application/endpoint/rtspserver.hpp>
+#include <application/endpoint/testsink.hpp>
 #include <application/pipeline/livestream.hpp>
 
 namespace libwebstreamer
@@ -43,6 +44,12 @@ namespace libwebstreamer
                     typedef libwebstreamer::application::endpoint::RtspServer RtspServer;
                     std::shared_ptr<RtspServer> ep = std::make_shared<RtspServer>(id, type, pipeline_owner);
                     ep->initialize(url);
+                    return ep;
+                }
+                case EndpointType::TEST_SINK:
+                {
+                    typedef libwebstreamer::application::endpoint::TestSink TestSink;
+                    std::shared_ptr<TestSink> ep = std::make_shared<TestSink>(id, type, pipeline_owner);
                     return ep;
                 }
                 // case StringValue::WEBRTC:

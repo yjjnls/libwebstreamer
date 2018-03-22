@@ -8,7 +8,8 @@ namespace libwebstreamer
     {
         RTSP_CLIENT = (1 << 0),
         RTSP_SERVER = (1 << 1),
-        WEBRTC = (1 << 2)
+        TEST_SINK = (1 << 2),
+        WEBRTC = (1 << 3)
     };
     enum VideoEncodingType
     {

@@ -29,7 +29,7 @@ namespace libwebstreamer
                 // static void on_rtp_time_out(GstElement *rtpbin, guint session, guint ssrc, gpointer user_data);
                 // static void on_get_new_rtpbin(GstElement *rtspsrc, GstElement *manager, gpointer user_data);
                 //to del
-                static GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer rtspclient);
+                static GstPadProbeReturn on_monitor_data(GstPad *pad, GstPadProbeInfo *info, gpointer rtspclient);
 
                 GstElement *rtspsrc_;
                 GstElement *rtpdepay_video_;
