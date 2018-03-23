@@ -30,6 +30,8 @@ namespace libwebstreamer
                 GstElement *video_decodec_;
                 GstElement *video_sink_;
                 GstElement *audio_decodec_;
+                GstElement *audio_convert_;
+                GstElement *audio_resample_;
                 GstElement *audio_sink_;
                 libwebstreamer::PipeJoint video_joint_;
                 libwebstreamer::PipeJoint audio_joint_;

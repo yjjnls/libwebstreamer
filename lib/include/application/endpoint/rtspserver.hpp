@@ -24,10 +24,6 @@ namespace libwebstreamer
                 virtual bool add_to_pipeline();
                 virtual bool remove_from_pipeline();
 
-                std::vector<libwebstreamer::PipeJoint> &joints()
-                {
-                    return joints_;
-                }
                 static void on_rtsp_media_constructed(GstRTSPMediaFactory *factory, GstRTSPMedia *media, gpointer user_data);
                 static void on_media_new_state(GstRTSPMedia *media, gint state, gpointer user_data);
                 //todo del
@@ -35,8 +31,8 @@ namespace libwebstreamer
 
             private:
                 std::string path_;
-                std::vector<libwebstreamer::PipeJoint> joints_;
-                GstElement *pipeline_;
+                libwebstreamer::PipeJoint video_joint_;
+                libwebstreamer::PipeJoint audio_joint_;
             };
 
             GstRTSPServer *get_rtsp_server();

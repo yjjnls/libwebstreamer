@@ -59,6 +59,8 @@ namespace libwebstreamer
 #ifdef USE_AUTO_SINK
                 GstElement *fake_video_decodec_;
                 GstElement *fake_audio_decodec_;
+                GstElement *fake_audio_convert_;
+                GstElement *fake_audio_resample_;
 #endif
                 //to del
                 GstElement *pipe;

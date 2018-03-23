@@ -31,8 +31,8 @@ async function create_livestream(ipc_url) {
         rtspurl: ipc_url,
         videoCodec: 'h264',
         videoMode: 'sendonly',
-        // audioMode: 'sendonly',
-        // audioCodec: 'pcma',
+        audioMode: 'sendonly',
+        audioCodec: 'pcma',
         component: 'livestream1',
         protocol: 'rtspclient',
         endpoint: 'endpoint1',
@@ -116,11 +116,10 @@ async function test() {
         await create_livestream('rtsp://172.16.66.65/id=1');
         // await add_viewer(rtsp_viewer1);
         // await add_viewer(rtsp_viewer2);
-        setInterval(() => {
 
+        setInterval(() => {
             add_viewer(test_viewer1);
             setTimeout(() => {
-
                 remove_viewer('endpoint4');
             }, 3000);
         }, 6000);

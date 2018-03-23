@@ -10,7 +10,6 @@ namespace libwebstreamer
     {
         GstElement *upstream_joint = NULL;
         GstElement *downstream_joint = NULL;
-        GstElement *rtsp_server_media_bin = NULL;
     };
 
     PipeJoint make_pipe_joint(const std::string &media_type = "video", const std::string &name = "");

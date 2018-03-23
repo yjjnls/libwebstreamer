@@ -70,7 +70,7 @@ namespace libwebstreamer
 
     void destroy_pipe_joint(PipeJoint pipejoint)
     {
-        gst_object_unref(pipejoint.upstream_joint);
-        gst_object_unref(pipejoint.downstream_joint);
+        // gst_object_unref(pipejoint.upstream_joint);
+        // gst_object_unref(pipejoint.downstream_joint);
     }
 }
