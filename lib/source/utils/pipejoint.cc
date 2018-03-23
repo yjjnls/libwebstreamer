@@ -58,7 +58,7 @@ namespace libwebstreamer
 
         GstElement *psink = gst_element_factory_make("proxysink", (name_ + "_proxysink").c_str());
         GstElement *psrc = gst_element_factory_make("proxysrc", (name_ + "_proxysrc").c_str());
-        g_object_set (psrc, "proxysink", psink, NULL);
+        g_object_set(psrc, "proxysink", psink, NULL);
         g_object_set_data(G_OBJECT(psink), "media-type", (gchar *)media_type.c_str());
 
         ///-----------------
@@ -67,10 +67,16 @@ namespace libwebstreamer
         pipejoint.downstream_joint = psrc;
         return pipejoint;
     }
-
-    void destroy_pipe_joint(PipeJoint pipejoint)
+    void update_downstream_joint(PipeJoint &pipejoint)
     {
-        // gst_object_unref(pipejoint.upstream_joint);
-        // gst_object_unref(pipejoint.downstream_joint);
+        GstElement *psrc = gst_element_factory_make("proxysrc", NULL);
+        g_object_set(psrc, "proxysink", pipejoint.upstream_joint, NULL);
+        pipejoint.downstream_joint = psrc;
+    }
+
+    void destroy_pipe_joint(PipeJoint &pipejoint)
+    {
+        pipejoint.upstream_joint = NULL;
+        pipejoint.downstream_joint = NULL;
     }
 }

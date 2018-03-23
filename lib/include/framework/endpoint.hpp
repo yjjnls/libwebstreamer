@@ -1,12 +1,8 @@
 #ifndef LIBWEBSTREAMER_FRAMEWORK_ENDPOINT_HPP
 #define LIBWEBSTREAMER_FRAMEWORK_ENDPOINT_HPP
 
-#include <vector>
-#include <list>
-#include <map>
-#include <string>
-#include <algorithm>
-#include <gst/gst.h>
+
+#include <utils/common.hpp>
 #include <fbs/webstreamer_generated.h>
 #include <utils/status_code.hpp>
 #include <utils/type_def.hpp>

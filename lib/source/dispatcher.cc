@@ -73,15 +73,19 @@ namespace libwebstreamer
         gst_main_loop = NULL;
     }
     //-------------------------------------------------------------//
+
     void initialize()
     {
+
         libwebstreamer_main_context = g_main_context_ref_thread_default();
         // gst_init(libwebstreamer_main_context);
         gst_init(NULL, NULL);
-        gst_run_in_background();
-
         GstRTSPServer *rtsp_server = libwebstreamer::application::endpoint::get_rtsp_server();
         rtsp_server_source_id = gst_rtsp_server_attach(rtsp_server, libwebstreamer_main_context);
+
+        USE_OWN_SAME_DEBUG();
+
+        gst_run_in_background();
     }
 
     void terminate()

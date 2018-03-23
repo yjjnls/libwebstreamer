@@ -64,7 +64,7 @@ let rtsp_viewer1 = {
     endpoint: 'endpoint2'//necessary
 }
 let rtsp_viewer2 = {
-    rtspurl: '/test',//necessary
+    rtspurl: '/test2',//necessary
     protocol: 'rtspserver',//necessary
     component: 'livestream1',//necessary
     endpoint: 'endpoint3'//necessary
@@ -114,20 +114,28 @@ async function test() {
         await Initialize(options);
         console.log('plugin version: ' + plugin.version());
         await create_livestream('rtsp://172.16.66.65/id=1');
-        // await add_viewer(rtsp_viewer1);
-        // await add_viewer(rtsp_viewer2);
+        await add_viewer(rtsp_viewer1);
+        await add_viewer(rtsp_viewer2);
 
-        setInterval(() => {
-            add_viewer(test_viewer1);
-            setTimeout(() => {
-                remove_viewer('endpoint4');
-            }, 3000);
-        }, 6000);
+        // setInterval(() => {
+        //     add_viewer(test_viewer1);
+        //     setTimeout(() => {
+        //         remove_viewer('endpoint4');
+        //     }, 3000);
+        // }, 6000);
 
-        // setTimeout(()=>{
+        // setInterval(() => {
+        //     add_viewer(rtsp_viewer1);
+        //     setTimeout(() => {
+        //         remove_viewer('endpoint2');
+        //     }, 8000);
+        // }, 10000);
 
-        //     add_viewer(rtsp_viewer2);
-        // },10000);
+        // setTimeout(() => {
+
+        //     // add_viewer(test_viewer1);
+        //     add_viewer(rtsp_viewer1);
+        // }, 3000);
         // await remove_viewer('endpoint2');
         // await remove_viewer('endpoint1');
         // await destroy_livestream();

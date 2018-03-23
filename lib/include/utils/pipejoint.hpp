@@ -13,7 +13,8 @@ namespace libwebstreamer
     };
 
     PipeJoint make_pipe_joint(const std::string &media_type = "video", const std::string &name = "");
-    void destroy_pipe_joint(PipeJoint pipejoint);
+    void update_downstream_joint(PipeJoint &pipejoint);
+    void destroy_pipe_joint(PipeJoint &pipejoint);
 }
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef LIBWEBSTREAMER_DISPATCHER_HPP
 #define LIBWEBSTREAMER_DISPATCHER_HPP
 
-#include<functional>
+#include <utils/common.hpp>
 
 namespace libwebstreamer
 {

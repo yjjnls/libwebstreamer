@@ -13,6 +13,7 @@ namespace libwebstreamer
                                    const std::shared_ptr<libwebstreamer::framework::Pipeline> pipeline_owner)
                 : libwebstreamer::framework::Endpoint(id, type, pipeline_owner)
             {
+                USE_OWN_SAME_DEBUG();
             }
 
             void RtspClient::initialize(const std::string &url)

@@ -22,7 +22,8 @@ namespace libwebstreamer
         class PipelineManager
         {
         public:
-            void call(const void *data, size_t size , const callback_fn &cb);
+            PipelineManager();
+            void call(const void *data, size_t size, const callback_fn &cb);
 
         private://LiveStream
             void create_livestream(const webstreamer::livestreamer::Create &message, const callback_fn &cb);

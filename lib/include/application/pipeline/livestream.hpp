@@ -3,7 +3,7 @@
 
 #include <framework/pipeline.hpp>
 
-#define USE_AUTO_SINK 1
+// #define USE_AUTO_SINK 1
 namespace libwebstreamer
 {
     namespace application
@@ -62,8 +62,6 @@ namespace libwebstreamer
                 GstElement *fake_audio_convert_;
                 GstElement *fake_audio_resample_;
 #endif
-                //to del
-                GstElement *pipe;
             };
         }
     }

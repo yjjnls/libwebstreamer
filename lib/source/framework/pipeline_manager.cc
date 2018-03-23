@@ -8,7 +8,10 @@ namespace libwebstreamer
     {
         using namespace libwebstreamer::utils;
         using namespace libwebstreamer::application::pipeline;
-
+        PipelineManager::PipelineManager()
+        {
+            USE_OWN_SAME_DEBUG();
+        }
         void PipelineManager::call(const void *data, size_t size, const callback_fn &cb)
         {
             // printf("-----PipelineManager::call-----\n");
@@ -122,7 +125,7 @@ namespace libwebstreamer
             // add pipeline to pipeline manager
             pipelines_.push_back(livestream);
             cb(0, NULL, 0);
-            g_message("---------create_live_stream: %s---------\n", stream_id.c_str());
+            GST_INFO("create_live_stream: %s\n", stream_id.c_str());
         }
         void PipelineManager::destroy_livestream(const webstreamer::livestreamer::Destroy &message, const callback_fn &cb)
         {
@@ -145,7 +148,7 @@ namespace libwebstreamer
 
             cb(0, NULL, 0);
 
-            g_message("---------delete_live_stream: %s---------\n", stream_id.c_str());
+            GST_INFO("delete_live_stream: %s\n", stream_id.c_str());
         }
         void PipelineManager::add_endpoint_in_livestream(const webstreamer::livestreamer::AddViewer &message, const callback_fn &cb)
         {
