@@ -125,7 +125,7 @@ namespace libwebstreamer
             // add pipeline to pipeline manager
             pipelines_.push_back(livestream);
             cb(0, NULL, 0);
-            GST_INFO("create_live_stream: %s\n", stream_id.c_str());
+            GST_INFO("[pipeline manager] create_live_stream: %s\n", stream_id.c_str());
         }
         void PipelineManager::destroy_livestream(const webstreamer::livestreamer::Destroy &message, const callback_fn &cb)
         {
@@ -148,7 +148,7 @@ namespace libwebstreamer
 
             cb(0, NULL, 0);
 
-            GST_INFO("delete_live_stream: %s\n", stream_id.c_str());
+            GST_INFO("[pipeline manager] delete_live_stream: %s\n", stream_id.c_str());
         }
         void PipelineManager::add_endpoint_in_livestream(const webstreamer::livestreamer::AddViewer &message, const callback_fn &cb)
         {

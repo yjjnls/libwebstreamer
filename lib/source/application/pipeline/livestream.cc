@@ -219,9 +219,9 @@ namespace libwebstreamer
                             gst_object_unref(sinkpad);
 
                             //monitor data probe
-                            GstPad *pad = gst_element_get_static_pad(fake_video_queue_, "src");
-                            gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, on_monitor_data, this, NULL);
-                            gst_object_unref(pad);
+                            // GstPad *pad = gst_element_get_static_pad(fake_video_queue_, "src");
+                            // gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, on_monitor_data, this, NULL);
+                            // gst_object_unref(pad);
                         }
                         if (!audio_encoding().empty())
                         {

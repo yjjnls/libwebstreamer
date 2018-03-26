@@ -60,6 +60,18 @@ cmake --build . --target ALL_BUILD --config Debug -- /p:Platform=x64
 cmake --build . --target INSTALL   --config Debug -- /p:Platform=x64  
 
 ```
+or just run the **build.bat** in the root dir  
+
+## test
+
+load enviroment
+```
+test\env.bat
+```
+run test
+```
+node test\test.js
+```
 
 ## Code Standards
 This project follows [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html).

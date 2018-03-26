@@ -43,7 +43,7 @@ namespace libwebstreamer
             // static GstElement *pipe = NULL;
             void RtspServer::on_media_new_state(GstRTSPMedia *media, gint state, gpointer user_data)
             {
-                GST_DEBUG("[rtsp-server] pipeline new state: %d", state);
+                GST_DEBUG("[rtsp-server] pipeline new state: %s", gst_element_state_get_name(GstState(state)));
                 if (state == GST_STATE_NULL)
                 {
                     GST_DEBUG("[rtsp-server] all the clients have been closed!");
@@ -106,7 +106,7 @@ namespace libwebstreamer
                     g_warn_if_fail(gst_element_link(rtspserver->video_joint_.downstream_joint, video_pay));
 
                     GstPad *pad = gst_element_get_static_pad(video_pay, "src");
-                    gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, rtspserver->cb_have_data, user_data, NULL);
+                    // gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, rtspserver->cb_have_data, user_data, NULL);
                     gst_object_unref(pad);
                 }
 

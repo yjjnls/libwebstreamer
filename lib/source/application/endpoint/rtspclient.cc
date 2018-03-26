@@ -64,7 +64,7 @@ namespace libwebstreamer
                         GstPadLinkReturn ret = gst_pad_link(src_pad, sink_pad);
                         g_warn_if_fail(ret == GST_PAD_LINK_OK);
                         gst_object_unref(sink_pad);
-                        gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, on_monitor_data, rtspclient, NULL);
+                        // gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, on_monitor_data, rtspclient, NULL);
                     }
                 }
                 else

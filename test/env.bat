@@ -6,3 +6,5 @@ set GST_PLUGIN_SCANNER=%GSTREAMER_ROOT%/libexec/gstreamer-0.10/gst-plugin-scanne
 set GST_PLUGIN_SCANNER_1_0=%GSTREAMER_ROOT%/libexec/gstreamer-1.0/gst-plugin-scanner
 PATH=%GSTREAMER_ROOT%bin;%PATH%
 set GI_TYPELIB_PATH=%GSTREAMER_ROOT%/lib/girepository-1.0
+
+set GST_DEBUG=libwebstreamer:5
