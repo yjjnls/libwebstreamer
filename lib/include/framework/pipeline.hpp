@@ -44,6 +44,7 @@ namespace libwebstreamer
                 return pipeline_;
             }
 
+
         protected:
             virtual bool on_add_endpoint(const std::shared_ptr<Endpoint> endpoint) = 0;
             virtual bool on_remove_endpoint(const std::shared_ptr<Endpoint> endpoint) = 0;
@@ -51,14 +52,18 @@ namespace libwebstreamer
             {
                 return true;
             }
+            std::vector<std::shared_ptr<Endpoint>> &endpoints()
+            {
+                return endpoints_;
+            }
 
+        private:
             std::string id_;
             std::string video_encoding_;
             std::string audio_encoding_;
             std::vector<std::shared_ptr<Endpoint>> endpoints_;
             GstElement *pipeline_;
 
-        private:
             //add for monitoring error messages from elements
             GstBus *bus_;
             guint bus_watcher_;

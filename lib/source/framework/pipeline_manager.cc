@@ -125,7 +125,7 @@ namespace libwebstreamer
             // add pipeline to pipeline manager
             pipelines_.push_back(livestream);
             cb(0, NULL, 0);
-            GST_INFO("[pipeline manager] create_live_stream: %s\n", stream_id.c_str());
+            GST_INFO("[pipeline manager] create live stream: %s\n", stream_id.c_str());
         }
         void PipelineManager::destroy_livestream(const webstreamer::livestreamer::Destroy &message, const callback_fn &cb)
         {
@@ -143,12 +143,14 @@ namespace libwebstreamer
             }
             //remove all endpoints in the pipeline, and then remove the pipeline
             g_assert(it->unique());
+            gst_element_set_state((*it)->pipeline(), GST_STATE_NULL);
             (*it)->remove_all_endpoints();
+            GST_INFO("[pipeline manager] remove all endpoints in: %s\n", stream_id.c_str());
             pipelines_.erase(it);
 
             cb(0, NULL, 0);
 
-            GST_INFO("[pipeline manager] delete_live_stream: %s\n", stream_id.c_str());
+            GST_INFO("[pipeline manager] delete live stream: %s\n", stream_id.c_str());
         }
         void PipelineManager::add_endpoint_in_livestream(const webstreamer::livestreamer::AddViewer &message, const callback_fn &cb)
         {
@@ -183,6 +185,7 @@ namespace libwebstreamer
                    static_cast<void *>(const_cast<char *>(reason.c_str())), reason.size());
                 return;
             }
+            GST_INFO("[pipeline manager] livestream %s add endpoint: %s\n", stream_id.c_str(), endpoint_id.c_str());
             cb(0, NULL, 0);
         }
         void PipelineManager::remove_endpoint_in_livestream(const webstreamer::livestreamer::RemoveViewer &message, const callback_fn &cb)
@@ -214,6 +217,7 @@ namespace libwebstreamer
                    static_cast<void *>(const_cast<char *>(reason.c_str())), reason.size());
                 return;
             }
+            GST_INFO("[pipeline manager] livestream %s remove endpoint: %s\n", stream_id.c_str(), endpoint_id.c_str());
         }
 
         bool PipelineManager::is_livestream_created(const std::string &id)

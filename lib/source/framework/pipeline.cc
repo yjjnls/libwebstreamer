@@ -17,6 +17,7 @@ namespace libwebstreamer
             bus_watcher_ = gst_bus_add_watch(bus_, message_handler, this);
             g_warn_if_fail(bus_);
             g_warn_if_fail(bus_watcher_);
+            USE_OWN_SAME_DEBUG();
         }
 
         gboolean Pipeline::message_handler(GstBus *bus, GstMessage *message, gpointer data)
@@ -60,6 +61,7 @@ namespace libwebstreamer
                 return false;
             }
             endpoints_.push_back(endpoint);
+            GST_DEBUG("[pipeline] %s add endpoint, there's %d totally!\n", id_.c_str(), endpoints().size());
             return true;
         }
 
@@ -75,7 +77,7 @@ namespace libwebstreamer
             g_assert(it->unique());
             on_remove_endpoint(*it);
             endpoints_.erase(it);
-            printf("-------endpoints left: %d----\n", endpoints_.size());
+            GST_DEBUG("[pipeline] %s remove endpoint, there's %d left!\n", id_.c_str(), endpoints().size());            
             return true;
         }
         bool Pipeline::remove_all_endpoints()
@@ -86,7 +88,7 @@ namespace libwebstreamer
                 on_remove_endpoint(endpoints_[i]);
             }
             endpoints_.erase(endpoints_.begin(), endpoints_.end());
-            printf("-------endpoints left: %d----\n", endpoints_.size());
+            GST_DEBUG("[pipeline] %s remove all endpoints, there's %d left!\n", id_.c_str(), endpoints().size());            
             return true;
         }
     }

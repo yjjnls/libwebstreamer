@@ -117,12 +117,12 @@ async function test() {
         await add_viewer(rtsp_viewer1);
         await add_viewer(rtsp_viewer2);
 
-        // setInterval(() => {
-        //     add_viewer(test_viewer1);
-        //     setTimeout(() => {
-        //         remove_viewer('endpoint4');
-        //     }, 3000);
-        // }, 6000);
+        setInterval(() => {
+            add_viewer(test_viewer1);
+            setTimeout(() => {
+                remove_viewer('endpoint4');
+            }, 5000);
+        }, 10000);
 
         // setInterval(() => {
         //     add_viewer(rtsp_viewer1);

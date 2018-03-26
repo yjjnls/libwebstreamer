@@ -3,6 +3,7 @@
 #include <application/endpoint/rtspserver.hpp>
 #include <application/endpoint/webrtc.hpp>
 #include <utils/pipejoint.hpp>
+#include <mutex>
 
 namespace libwebstreamer
 {
@@ -13,6 +14,7 @@ namespace libwebstreamer
             using namespace libwebstreamer;
             using namespace libwebstreamer::framework;
 
+            static std::mutex joint_mutex;
             LiveStream::LiveStream(const std::string &id)
                 : Pipeline(id)
                 , video_tee_pad_(NULL)
@@ -51,7 +53,7 @@ namespace libwebstreamer
 
             void LiveStream::add_pipe_joint(GstElement *upstream_joint)
             {
-
+                joint_mutex.lock();
                 gchar *media_type = (gchar *)g_object_get_data(G_OBJECT(upstream_joint), "media-type");
                 if (g_str_equal(media_type, "video"))
                 {
@@ -87,6 +89,7 @@ namespace libwebstreamer
 
                     sinks_.push_back(info);
                 }
+                joint_mutex.unlock();
             }
             GstPadProbeReturn LiveStream::on_tee_pad_remove_video_probe(GstPad *teepad, GstPadProbeInfo *probe_info, gpointer data)
             {
@@ -138,6 +141,7 @@ namespace libwebstreamer
             }
             void LiveStream::remove_pipe_joint(GstElement *upstream_joint)
             {
+                joint_mutex.lock();
                 gchar *media_type = (gchar *)g_object_get_data(G_OBJECT(upstream_joint), "media-type");
                 if (g_str_equal(media_type, "video"))
                 {
@@ -181,6 +185,7 @@ namespace libwebstreamer
                     sinks_.erase(it);
                     GST_DEBUG("[livestream] remove video joint completed");
                 }
+                joint_mutex.unlock();
             }
 
             bool LiveStream::on_add_endpoint(const std::shared_ptr<Endpoint> endpoint)
@@ -277,6 +282,7 @@ namespace libwebstreamer
                         g_warn_if_reached();
                         break;
                 }
+
                 return true;
             }
 
@@ -313,13 +319,14 @@ namespace libwebstreamer
                         g_warn_if_reached();
                         return false;
                 }
+
                 return true;
             }
             GstPadProbeReturn LiveStream::on_monitor_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data)
             {
                 static int count = 0;
                 auto pipeline = static_cast<LiveStream *>(user_data);
-                printf("+%d", GST_STATE(pipeline->pipeline_));
+                printf("+%d", GST_STATE(pipeline->pipeline()));
                 return GST_PAD_PROBE_OK;
             }
 
