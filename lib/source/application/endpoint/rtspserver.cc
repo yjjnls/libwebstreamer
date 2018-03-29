@@ -186,6 +186,8 @@ namespace libwebstreamer
 
             bool RtspServer::remove_from_pipeline()
             {
+                // TODO: if some clients hasn't closed when we want to close the server, 
+                // we must clean all the connected sockets opened firstly.
                 if (!pipeline_owner().lock()->video_encoding().empty() &&
                     video_joint_.upstream_joint != NULL)
                 {
