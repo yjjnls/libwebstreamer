@@ -36,7 +36,7 @@ public:
 bool RTSPTestServer::Initialize(Promise* promise)
 {
 	rtspservice_ = new RTSPTestService(this, "test");
-	promise->resolve();
+	// promise->resolve();
 	return true;
 }
 

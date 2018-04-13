@@ -23,7 +23,7 @@ message_handler(GstBus * bus, GstMessage * message, gpointer data)
 bool ElementWatcher::Initialize(Promise* promise)
 {
 	
-	promise->resolve();
+	// promise->resolve();
 	return true;
 }
 
