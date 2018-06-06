@@ -6,7 +6,7 @@ enable_testing()
 include(cam.camke)
 cam_compiler_flags()
 cam_find_pkgconfig(0.29.1)
-cam_find_gstreamer(1.14)
+# cam_find_gstreamer(1.14)
 pkg_check_modules(GST_MODULES  REQUIRED                  
                   gstreamer-1.0>=1.14.0
                   gstreamer-base-1.0>=1.14.0
