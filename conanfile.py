@@ -21,18 +21,16 @@ class LibWebstreamerConan(ConanFile):
     default_options = "shared=True", "fPIC=True"
     source_subfolder = "source_subfolder"
 
-    exports_sources = 'CMakeLists.txt','conan.cmake','lib/*'
+    exports_sources = 'CMakeLists.txt', 'conan.cmake', 'lib/*'
     generators = "cmake"
     gstreamer_root = ""
+
+    # requires = "gstreamer-dev/1.14.0.1@%s/stable" % os.environ.get(
+    #     "CONAN_USERNAME", "yjjnls")
 
     def config_options(self):
         if self.settings.os == "Windows":
             self.options.remove("fPIC")
-        if self.settings.os == 'Linux':
-            self.gstreamer_root = os.environ.get("GSTREAMER_ROOT",
-                                                 "/opt/gstreamer/linux_x86_64")
-        else:
-            pass
 
     def source(self):
         self.run("git config --global user.name \"yjjnls\"")
@@ -49,6 +47,8 @@ class LibWebstreamerConan(ConanFile):
 
         self.requires("gstreamer-runtime/1.14.0.1@%s/stable" % os.environ.get(
             "CONAN_USERNAME", "yjjnls"))
+        self.requires("gstreamer-dev/1.14.0.1@%s/stable" % os.environ.get(
+            "CONAN_USERNAME", "yjjnls"))
         self.requires("gstreamer-custom/1.14.0.1@%s/stable" % os.environ.get(
             "CONAN_USERNAME", "yjjnls"))
         # self.requires("tesseract.plugin/0.2.0@%s/stable" % os.environ.get(
@@ -57,8 +57,25 @@ class LibWebstreamerConan(ConanFile):
         pass
 
     def build(self):
-        self.requires("gstreamer-dev/1.14.0.1@%s/stable" % os.environ.get(
-            "CONAN_USERNAME", "yjjnls"))
+        if self.settings.os == 'Linux':
+            self.gstreamer_root = os.environ.get(
+                "GSTREAMER_ROOT",
+                "%s/gstreamer/linux_x86_64" % os.getenv("HOME"))
+            os.environ["GSTREAMER_ROOT"] = self.gstreamer_root
+            self.run("sudo mkdir -p %s", self.gstreamer_root)
+        else:
+            pass
+        if self.settings.os == 'Linux':
+            if not os.getenv('PKG_CONFIG_EXECUTABLE'):
+                self.run(
+                    "wget https://pkg-config.freedesktop.org/releases/pkg-config-0.29.1.tar.gz",
+                    cwd="/tmp")
+                self.run("tar -zxf pkg-config-0.29.1.tar.gz", cwd="/tmp")
+                self.run(
+                    "./configure --prefix=/usr --with-internal-glib --disable-host-tool --docdir=/usr/share/doc/pkg-config-0.29.1",
+                    cwd="/tmp/pkg-config-0.29.1")
+                self.run("make", cwd="/tmp/pkg-config-0.29.1")
+                self.run("sudo make install", cwd="/tmp/pkg-config-0.29.1")
 
         if self.settings.os == "Linux":
             vars = {
@@ -68,8 +85,7 @@ class LibWebstreamerConan(ConanFile):
 
         cmake = CMake(self)
         with tools.environment_append(vars):
-            cmake.configure(
-                build_folder='build/libwebstreamer')
+            cmake.configure(build_folder='build/libwebstreamer')
             cmake.build(build_dir='build/libwebstreamer')
 
             # ld_path = ""
