@@ -32,6 +32,14 @@ class LibWebstreamerConan(ConanFile):
         self.run("git config --global user.email \"x-jj@foxmail.com\"")
 
     def requirements(self):
+        try:
+            if self.settings.os == 'Linux':
+                self.run("sudo conan remote add upload_${CONAN_USERNAME} \
+                https://api.bintray.com/conan/${CONAN_USERNAME}/stable --insert 0"
+                         )
+        except Exception as e:
+            print "The repo may have been added, the error above can be ignored."
+
         self.requires("gstreamer-runtime/1.14.0.1@%s/stable" % os.environ.get(
             "CONAN_USERNAME", "yjjnls"))
         # self.requires("tesseract.plugin/0.2.0@%s/stable" % os.environ.get(
