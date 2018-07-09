@@ -1,7 +1,7 @@
 project(lib)
 file(GLOB_RECURSE  LWS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.[ch] 
      ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
-cam_project_group(LWS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR})
+conan_project_group(LWS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR})
 
 foreach( filename ${LWS_SOURCES} )
 message(${filename})

@@ -3,10 +3,9 @@ project(libwebstreamer)
 
 
 enable_testing()
-include(cam.camke)
-cam_compiler_flags()
-cam_find_pkgconfig(0.29.1)
-# cam_find_gstreamer(1.14)
+include(${CMAKE_CURRENT_SOURCE_DIR}/conan.cmake)
+conan_find_pkgconfig( 0.29.1 )
+conan_compiler_flags()
 pkg_check_modules(GST_MODULES  REQUIRED                  
                   gstreamer-1.0>=1.14.0
                   gstreamer-base-1.0>=1.14.0
