@@ -1,0 +1,23 @@
+linux: &linux
+  os: linux
+  sudo: required
+  language: python
+  python: "2.7"
+  services:
+    - docker
+osx: &osx
+  os: osx
+  language: generic
+matrix:
+  include:
+    - <<: *linux
+      env:  CONAN_GCC_VERSIONS=4.9 CONAN_DOCKER_IMAGE=lasote/conangcc49 CONAN_BUILD_TYPES=Release CONAN_ARCHS=x86_64
+
+install:
+  - sudo pip install conan --upgrade
+  - sudo pip install conan_package_tools bincrafters_package_tools
+  - sudo pip install shell
+  - sudo conan user
+
+script:
+  - sudo python build.py
