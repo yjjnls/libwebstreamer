@@ -9,16 +9,36 @@ from conans import CMake, ConanFile, RunEnvironment, tools
 
 class TestPackageConan(ConanFile):
     def imports(self):
-        if not os.path.exists("webstreamer"):
-            self.run("git clone https://github.com/yjjnls/webstreamer.git")
-
-            self.run("cd webstreamer && git checkout linux && sudo npm install")
+        print "-------->imports     current dir: %s" % os.getcwd()
+        if platform.system() == "Linux":
+            self.run(
+                "wget https://nodejs.org/dist/v10.4.0/node-v10.4.0-linux-x64.tar.xz")
+            self.run("tar -xf node-v10.4.0-linux-x64.tar.xz")
+            self.run("sudo cp -rf node-v10.4.0-linux-x64/* /usr/local")
 
     def requirements(self):
+        print "-------->requirements    current dir: %s" % os.getcwd()
+        self.root = "%s/libwebstreamer" % os.getcwd()
+        self.test_dir = "%s/libwebstreamer/test_package_build" % os.getcwd()
         self.requires("tesseract.plugin/0.2.2@%s/stable" %
                       os.environ.get("CONAN_USERNAME", "yjjnls"))
 
     def test(self):
+        print "-------->test    current dir: %s" % os.getcwd()
+        # self.run("sudo mkdir -p %s", self.test_dir)
+        self.run("git clone https://github.com/yjjnls/webstreamer.git",
+                 cwd="%s" % os.getenv("HOME"))
+        self.run("mkdir -p webstreamer/node_modules/node-plugin/bin",
+                 cwd=os.getenv("HOME"))
+        self.run("sudo chmod 777 webstreamer/node_modules/node-plugin/bin",
+                 cwd=os.getenv("HOME"))
+        self.run("ls -alF", cwd="%s" % os.getenv("HOME"))
+        self.run("ls -alF %s/webstreamer" % os.getenv("HOME"))
+
+        # self.run("ls -alF webstreamer/node_modules/node-plugin/bin")
+        # self.run("cd webstreamer/node_modules/node-plugin/bin && pwd")
+        self.run("cd webstreamer && git checkout linux && pwd && sudo npm install",
+                 cwd="%s" % os.getenv("HOME"))
         if platform.system() == "Windows":
             self.run("pip install cpplint")
         else:
@@ -74,4 +94,4 @@ class TestPackageConan(ConanFile):
                 command1 = "&& npm test test/webstreamer.test.js "
                 command2 = "&& npm test test/livestream.test.js "
             self.run("%s%s%s" % (load_gstreamer, command1, command2),
-                     cwd="%s/webstreamer" % os.getcwd())
+                     cwd="%s/webstreamer" % os.getenv("HOME"))
