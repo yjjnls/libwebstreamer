@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from conans import ConanFile, CMake, tools
 import os
-import platform
+
+from conans import CMake, ConanFile, tools
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 
@@ -25,9 +25,6 @@ class LibWebstreamerConan(ConanFile):
     generators = "cmake"
     gstreamer_root = ""
 
-    # requires = "gstreamer-dev/1.14.0.1@%s/stable" % os.environ.get(
-    #     "CONAN_USERNAME", "yjjnls")
-
     def config_options(self):
         if self.settings.os == "Windows":
             self.options.remove("fPIC")
@@ -40,48 +37,45 @@ class LibWebstreamerConan(ConanFile):
         try:
             if self.settings.os == 'Linux':
                 self.run("sudo conan remote add upload_${CONAN_USERNAME} \
-                https://api.bintray.com/conan/${CONAN_USERNAME}/stable --insert 0"
-                         )
+                https://api.bintray.com/conan/${CONAN_USERNAME}/stable --insert 0 >/dev/null")
         except Exception as e:
             print "The repo may have been added, the error above can be ignored."
 
-        self.requires("gstreamer-runtime/1.14.0.1@%s/stable" % os.environ.get(
-            "CONAN_USERNAME", "yjjnls"))
-        self.requires("gstreamer-dev/1.14.0.1@%s/stable" % os.environ.get(
-            "CONAN_USERNAME", "yjjnls"))
-        self.requires("gstreamer-custom/1.14.0.1@%s/stable" % os.environ.get(
-            "CONAN_USERNAME", "yjjnls"))
-        # self.requires("tesseract.plugin/0.2.0@%s/stable" % os.environ.get(
-        #     "CONAN_USERNAME", "yjjnls"))
+        self.requires("gstreamer-runtime/1.14.0.1@%s/stable" %
+                      os.environ.get("CONAN_USERNAME", "yjjnls"))
+        self.requires("gstreamer-custom/1.14.0.1@%s/stable" %
+                      os.environ.get("CONAN_USERNAME", "yjjnls"))
 
-        pass
+    def build_requirements(self):
+        if self.settings.os == "Linux":
+            self.build_requires("gstreamer-dev/1.14.0.1@%s/stable" %
+                                os.environ['CONAN_USERNAME'])
 
     def build(self):
         if self.settings.os == 'Linux':
             self.gstreamer_root = os.environ.get(
-                "GSTREAMER_ROOT",
-                "%s/gstreamer/linux_x86_64" % os.getenv("HOME"))
+                "GSTREAMER_ROOT", "%s/gstreamer/linux_x86_64" % os.getenv("HOME"))
             os.environ["GSTREAMER_ROOT"] = self.gstreamer_root
             self.run("sudo mkdir -p %s", self.gstreamer_root)
         else:
             pass
         if self.settings.os == 'Linux':
-            if not os.getenv('PKG_CONFIG_EXECUTABLE'):
-                self.run(
-                    "wget https://pkg-config.freedesktop.org/releases/pkg-config-0.29.1.tar.gz",
-                    cwd="/tmp")
-                self.run("tar -zxf pkg-config-0.29.1.tar.gz", cwd="/tmp")
-                self.run(
-                    "./configure --prefix=/usr --with-internal-glib --disable-host-tool --docdir=/usr/share/doc/pkg-config-0.29.1",
-                    cwd="/tmp/pkg-config-0.29.1")
-                self.run("make", cwd="/tmp/pkg-config-0.29.1")
-                self.run("sudo make install", cwd="/tmp/pkg-config-0.29.1")
+            self.run(
+                "if [ `expr $(pkg-config --version) \< 0.29.1` -ne 0 ]; then \
+                cd /tmp \
+                && wget https://pkg-config.freedesktop.org/releases/pkg-config-0.29.1.tar.gz \
+                && tar -zxf pkg-config-0.29.1.tar.gz \
+                && cd pkg-config-0.29.1 \
+                && ./configure --prefix=/usr        \
+                --with-internal-glib \
+                --disable-host-tool  \
+                --docdir=/usr/share/doc/pkg-config-0.29.1 \
+                && make \
+                && sudo make install; fi")
 
         if self.settings.os == "Linux":
-            vars = {
-                'PKG_CONFIG_PATH': "%s/lib/pkgconfig" % self.gstreamer_root,
-                'GSTREAMER_ROOT': self.gstreamer_root
-            }
+            vars = {'PKG_CONFIG_PATH': "%s/lib/pkgconfig" % self.gstreamer_root,
+                    'GSTREAMER_ROOT': self.gstreamer_root}
 
         cmake = CMake(self)
         with tools.environment_append(vars):
