@@ -28,9 +28,9 @@ class TestPackageConan(ConanFile):
                  cwd="%s/webstreamer" % os.getcwd())
 
         self.run("git clone https://github.com/yjjnls/gstwebrtc-demos.git")
-        # self.run(
-        #     "pid=$(ps -elf |grep -i simple-server|grep -v grep|awk '{print $4}') && sudo kill -9 $pid")
-        # self.run("cd gstwebrtc-demos/signalling && python3 simple-server.py&")
+        self.run(
+            "pid=$(ps -elf |grep -i simple-server|grep -v grep|awk '{print $4}') && sudo kill -9 $pid")
+        self.run("cd gstwebrtc-demos/signalling && python3 simple-server.py&")
 
         if platform.system() == "Windows":
             self.run("pip install cpplint")
@@ -74,29 +74,25 @@ class TestPackageConan(ConanFile):
             'TESSERACT_PLUGIN_PATH': tesseract_plugin_path,
             'LIBWEBSTREAMER_PATH': libwebstreamer_path,
             'TESSDATA_PREFIX': tessdata_dir,
-            'GST_DEBUG': 'webstreamer:5',
+            'GST_DEBUG': 'rtsp*:3,webstreamer:5,*:2',
             'GSTREAMER_ROOT': gstreamer_root,
             'GST_PLUGIN_SYSTEM_PATH_1_0': '%s/lib/gstreamer-1.0' % gstreamer_root,
             'GST_PLUGIN_SCANNER_1_0': '%s/libexec/gstreamer-1.0/gst-plugin-scanner' % gstreamer_root,
             'PATH': '%s/bin:%s' % (gstreamer_root, os.environ['PATH']),
-            'GI_TYPELIB_PATH': '%s/lib/girepository-1.0' % gstreamer_root,
-            'CPPFLAGS': '-I%s/include %s' % (gstreamer_root, os.environ['CPPFLAGS']),
-            'LDFLAGS': "-L%s/lib %s" % (gstreamer_root, os.environ['LDFLAGS']),
-            'CFLAGS': "-I%s/include %s" % (gstreamer_root, os.environ['CFLAGS']),
-            'CXXFLAGS': "-I%s/include %s" % (gstreamer_root, os.environ['CXXFLAGS'])
+            'GI_TYPELIB_PATH': '%s/lib/girepository-1.0' % gstreamer_root
         }
         print ''
-        print 'export LD_LIBRARY_PATH=%s' % '%s:%s' % (
-            libwebstreamer_path, bin_path)
+        print 'export LD_LIBRARY_PATH=%s/lib:%s/lib/gstreamer-1.0:%s/bin:%s:%s' % (
+            gstreamer_root, gstreamer_root, gstreamer_root, libwebstreamer_path, bin_path)
         print 'export TESSERACT_PLUGIN_PATH=%s' % tesseract_plugin_path
         print 'export LIBWEBSTREAMER_PATH=%s' % libwebstreamer_path
         print 'export TESSDATA_PREFIX=%s' % tessdata_dir
         print 'export GSTREAMER_ROOT=%s' % gstreamer_root
-        print 'export GST_DEBUG=webstreamer:5'
-        print 'export GST_PLUGIN_PATH=%s/bin:%s/lib:%s/lib/gstreamer-1.0' % (
-            gstreamer_root, gstreamer_root, gstreamer_root)
+        print 'export GST_DEBUG=*:2,rtspclient:5,webstreamer:5'
         print 'export GST_PLUGIN_SYSTEM_PATH_1_0=%s/lib/gstreamer-1.0' % gstreamer_root
         print 'export GST_PLUGIN_SCANNER_1_0=%s/libexec/gstreamer-1.0/gst-plugin-scanner' % gstreamer_root
+        print 'export PATH=%s/bin:%s' % (gstreamer_root, os.environ['PATH']),
+        print 'export GI_TYPELIB_PATH=%s/lib/girepository-1.0' % gstreamer_root
         print ''
 
         # custom: run test
