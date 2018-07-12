@@ -197,6 +197,7 @@ GstPadProbeReturn cb_have_data(GstPad *pad, GstPadProbeInfo *info, gpointer user
 void IRTSPService::on_rtsp_media_constructed(GstRTSPMediaFactory *factory, GstRTSPMedia *media, gpointer user_data)
 {
     auto rtspserver = static_cast<IRTSPService *>(user_data);
+    GST_DEBUG("[rtsp-server] (path: %s) on_rtsp_media_constructed", rtspserver->path_.c_str());
     GstElement *rtsp_server_media_bin = gst_rtsp_media_get_element(media);
 
     GstRTSPStream *gstrtspstream = gst_rtsp_media_get_stream(media, 0);
