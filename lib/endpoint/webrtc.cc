@@ -194,14 +194,14 @@ bool WebRTC::initialize(Promise *promise)
     g_assert_nonnull(pipeline_);
     webrtc_ = gst_bin_get_by_name(GST_BIN(pipeline_), "webrtc");
 
-    gboolean sync = TRUE;
-    g_object_get(G_OBJECT(webrtc_), "sink-false", &sync, NULL);
-    if (!sync) {
-        GST_FIXME("[webrtc] %p (%s) uses the fixed plugin.", webrtc_, role_.c_str());
-    } else {
-        GST_FIXME("[webrtc] %p (%s) uses the origin plugin.", webrtc_, role_.c_str());
-    }
-    g_object_set(G_OBJECT(webrtc_), "sink-false", TRUE, NULL);
+    // gboolean sync = TRUE;
+    // g_object_get(G_OBJECT(webrtc_), "sink-false", &sync, NULL);
+    // if (!sync) {
+    //     GST_FIXME("[webrtc] %p (%s) uses the fixed plugin.", webrtc_, role_.c_str());
+    // } else {
+    //     GST_FIXME("[webrtc] %p (%s) uses the origin plugin.", webrtc_, role_.c_str());
+    // }
+    // g_object_set(G_OBJECT(webrtc_), "sink-false", TRUE, NULL);
 
     // specific parameter
     if (app()->video_encoding() == "h264") {

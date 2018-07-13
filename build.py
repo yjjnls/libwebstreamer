@@ -109,7 +109,11 @@ if __name__ == '__main__':
     shutil.copy('conanfile.py.origin~', 'conanfile.py')
 
     CONAN_USERNAME = os.environ.get("CONAN_USERNAME", "yjjnls")
-    os.environ['CONAN_USERNAME'] = CONAN_USERNAME
+
+    CONAN_PREBUILT_REPO = os.environ.get("CONAN_PREBUILT_REPO", "yjjnls")
+    os.environ['CONAN_PREBUILT_REPO'] = CONAN_PREBUILT_REPO
+
+
 
     try:
         if os.path.exists('conanfile.py'):

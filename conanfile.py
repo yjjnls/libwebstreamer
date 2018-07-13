@@ -10,7 +10,7 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 
 class LibWebstreamerConan(ConanFile):
     name = "libwebstreamer"
-    version = "0.1.0-dev"
+    version = "0.1.0"
     description = "custom modified gstreamer library"
     url = "https://github.com/yjjnls/conan-gstreamer"
     license = "Apache-2.0"
@@ -36,20 +36,20 @@ class LibWebstreamerConan(ConanFile):
     def requirements(self):
         try:
             if self.settings.os == 'Linux':
-                self.run("sudo conan remote add upload_${CONAN_USERNAME} \
-                https://api.bintray.com/conan/${CONAN_USERNAME}/stable --insert 0 >/dev/null")
+                self.run("sudo conan remote add upload_${CONAN_PREBUILT_REPO} \
+                https://api.bintray.com/conan/${CONAN_PREBUILT_REPO}/stable --insert 0 >/dev/null")
         except Exception as e:
             print "The repo may have been added, the error above can be ignored."
 
         self.requires("gstreamer-runtime/1.14.0.1@%s/stable" %
-                      os.environ.get("CONAN_USERNAME", "yjjnls"))
+                      os.environ.get("CONAN_PREBUILT_REPO"))
         self.requires("gstreamer-custom/1.14.0.1@%s/stable" %
-                      os.environ.get("CONAN_USERNAME", "yjjnls"))
+                      os.environ.get("CONAN_PREBUILT_REPO"))
 
     def build_requirements(self):
         if self.settings.os == "Linux":
             self.build_requires("gstreamer-dev/1.14.0.1@%s/stable" %
-                                os.environ['CONAN_USERNAME'])
+                                os.environ['CONAN_PREBUILT_REPO'])
 
     def build(self):
         if self.settings.os == 'Linux':
