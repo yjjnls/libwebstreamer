@@ -19,5 +19,14 @@ install:
   - sudo pip install shell
   - sudo conan user
 
+addons:
+  coverity_scan:
+    project:
+      name: ${TRAVIS_COVERITY_SCAN_PROJECT_NAME} # yjjnls/libwebstreamer
+    notification_email: ${TRAVIS_COVERITY_SCAN_NOTIFICATION_EMAIL}
+    build_command_prepend: "mkdir -p build && cd build && sudo conan install .. && cmake .."
+    build_command: "make"
+    branch_pattern: coverity_scan
+
 script:
-  - sudo python build.py
+  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then sudo python build.py ; fi
