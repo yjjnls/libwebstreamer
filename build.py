@@ -91,7 +91,10 @@ def build():
             if settings["compiler"] == "gcc":
                 if settings["compiler.version"] == '4.9' and settings["arch"] == 'x86_64':
                     builds.append(
-                        [settings, options, env_vars, build_requires])
+                        [settings, options,
+                         {'DEPENDENT_BINTRAY_REPO':
+                          DEPENDENT_BINTRAY_REPO},
+                         build_requires])
     builder.builds = builds
     builder.run()
 
@@ -109,11 +112,11 @@ if __name__ == '__main__':
     shutil.copy('conanfile.py.origin~', 'conanfile.py')
 
     CONAN_USERNAME = os.environ.get("CONAN_USERNAME", "yjjnls")
+    os.environ['CONAN_USERNAME'] = CONAN_USERNAME
 
-    CONAN_PREBUILT_REPO = os.environ.get("CONAN_PREBUILT_REPO", "yjjnls")
-    os.environ['CONAN_PREBUILT_REPO'] = CONAN_PREBUILT_REPO
-
-
+    DEPENDENT_BINTRAY_REPO = os.environ.get(
+        "DEPENDENT_BINTRAY_REPO", CONAN_USERNAME)
+    os.environ['DEPENDENT_BINTRAY_REPO'] = DEPENDENT_BINTRAY_REPO
 
     try:
         if os.path.exists('conanfile.py'):
