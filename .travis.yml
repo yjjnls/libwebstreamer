@@ -22,9 +22,9 @@ install:
 addons:
   coverity_scan:
     project:
-      name: ${TRAVIS_COVERITY_SCAN_PROJECT_NAME} # yjjnls/libwebstreamer
+      name: ${COVERITY_SCAN_PROJECT_NAME}
     notification_email: ${TRAVIS_COVERITY_SCAN_NOTIFICATION_EMAIL}
-    build_command_prepend: "mkdir -p build && cd build && sudo conan install .. && cmake .."
+    build_command_prepend: "chmod +x .travis/install.sh && ./.travis/install.sh && mkdir -p build && cd build && sudo conan install .. -e DEPENDENT_BINTRAY_REPO=${DEPENDENT_BINTRAY_REPO} && export PKG_CONFIG_PATH=${HOME}/gstreamer/linux_x86_64/lib/pkgconfig && cmake .."
     build_command: "make"
     branch_pattern: coverity_scan
 

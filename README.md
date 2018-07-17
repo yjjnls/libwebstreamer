@@ -6,7 +6,8 @@ Coding Rule see [Google C++ Style Guide](https://google.github.io/styleguide/cpp
 
 ## Linux
 
-[![](https://www.travis-ci.org/yjjnls/libwebstreamer.svg?branch=master)](https://www.travis-ci.org/yjjnls/libwebstreamer)  
+[![](https://www.travis-ci.org/yjjnls/libwebstreamer.svg?branch=master)](https://www.travis-ci.org/yjjnls/libwebstreamer)
+[![](https://scan.coverity.com/projects/16259/badge.svg?flat=1)](https://scan.coverity.com/projects/yjjnls-libwebstreamer?tab=project_settings)
 
 libwebstreamer coulld be built in either docker or your host. The release versions are all built in docker `lasote/conangcc49` by travis.
 
@@ -78,3 +79,17 @@ $ sudo pip3 install websockets
 ```sh
 $ sudo python build.py
 ```
+
+### Coverity
+If you want to use coverity to analyze your code, create a brach `coverity_scan` and set the environment vars in your travis's settings.
+
+-   COVERITY_SCAN_TOKEN   
+    project token in the `Project Settings` page of your project in coverity
+
+-   COVERITY_SCAN_PROJECT_NAME   
+    Project Name in the `Project Settings` page of your project in coverity
+
+-   TRAVIS_COVERITY_SCAN_NOTIFICATION_EMAIL   
+    your notification email
+
+-   DEPENDENT_BINTRAY_REPO
