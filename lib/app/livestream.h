@@ -46,8 +46,9 @@ class LiveStream : public IApp
 
     LiveStream(const std::string &name, WebStreamer *ws);
     ~LiveStream();
-    void add_pipe_joint(GstElement *upstream_joint);
-    void remove_pipe_joint(GstElement *upstream_joint);
+
+    virtual void add_pipe_joint(GstElement *upstream_joint, GstElement *downstream_joint);
+    virtual void remove_pipe_joint(GstElement *upstream_joint, GstElement *downstream_joint);
 
     virtual void On(Promise *promise);
     virtual bool Initialize(Promise *promise);
@@ -66,6 +67,8 @@ class LiveStream : public IApp
     virtual bool MessageHandler(GstMessage *msg);
 
  private:
+    void link_stream_output_joint(GstElement *upstream_joint);
+    void remove_stream_output_joint(GstElement *upstream_joint);
     static GstPadProbeReturn
     on_tee_pad_remove_video_probe(GstPad *pad,
                                   GstPadProbeInfo *probe_info,

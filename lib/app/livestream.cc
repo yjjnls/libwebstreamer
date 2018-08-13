@@ -30,6 +30,8 @@ std::mutex LiveStream::joint_mutex_;
 
 LiveStream::LiveStream(const std::string &name, WebStreamer *ws)
     : IApp(name, ws)
+    , video_tee_(NULL)
+    , audio_tee_(NULL)
     , performer_(NULL)
     , video_tee_pad_(NULL)
     , fake_video_queue_(NULL)
@@ -47,7 +49,9 @@ bool LiveStream::Initialize(Promise *promise)
 {
     IApp::Initialize(promise);
     video_tee_ = gst_element_factory_make("tee", "video_tee");
+    g_object_set(video_tee_, "allow-not-linked", true, NULL);
     audio_tee_ = gst_element_factory_make("tee", "audio_tee");
+    g_object_set(audio_tee_, "allow-not-linked", true, NULL);
     g_warn_if_fail(gst_bin_add(GST_BIN(pipeline()), video_tee_));
     g_warn_if_fail(gst_bin_add(GST_BIN(pipeline()), audio_tee_));
 
@@ -390,8 +394,16 @@ bool LiveStream::on_add_endpoint(IEndpoint *endpoint)
     return true;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+void LiveStream::add_pipe_joint(GstElement *upstream_joint, GstElement *downstream_joint)
+{
+    link_stream_output_joint(upstream_joint);
+}
+void LiveStream::remove_pipe_joint(GstElement *upstream_joint, GstElement *downstream_joint)
+{
+    remove_stream_output_joint(upstream_joint);
+}
 // for other endpoint
-void LiveStream::add_pipe_joint(GstElement *upstream_joint)
+void LiveStream::link_stream_output_joint(GstElement *upstream_joint)
 {
     joint_mutex_.lock();
     gchar *media_type = (gchar *)g_object_get_data(G_OBJECT(upstream_joint), "media-type");
@@ -474,7 +486,7 @@ GstPadProbeReturn LiveStream::on_tee_pad_remove_audio_probe(GstPad *pad, GstPadP
     GST_DEBUG("[livestream] remove audio joint from tee pad");
     return GST_PAD_PROBE_REMOVE;
 }
-void LiveStream::remove_pipe_joint(GstElement *upstream_joint)
+void LiveStream::remove_stream_output_joint(GstElement *upstream_joint)
 {
     joint_mutex_.lock();
     gchar *media_type = (gchar *)g_object_get_data(G_OBJECT(upstream_joint), "media-type");

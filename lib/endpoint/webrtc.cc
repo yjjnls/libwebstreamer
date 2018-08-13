@@ -215,9 +215,9 @@ bool WebRTC::initialize(Promise *promise)
     //     g_signal_connect(webrtc_, "pad-added", G_CALLBACK(WebRTC::on_webrtc_pad_added), this);
     // }
     if (role_ == "offer") {
-        GstPromise *promise = gst_promise_new_with_change_func(WebRTC::on_sdp_created, this, NULL);
-        g_signal_emit_by_name(webrtc_, "create-offer", NULL, promise);
-        // g_signal_connect(webrtc_, "on-negotiation-needed", G_CALLBACK(WebRTC::on_negotiation_needed), this);
+        // GstPromise *promise = gst_promise_new_with_change_func(WebRTC::on_sdp_created, this, NULL);
+        // g_signal_emit_by_name(webrtc_, "create-offer", NULL, promise);
+        g_signal_connect(webrtc_, "on-negotiation-needed", G_CALLBACK(WebRTC::on_negotiation_needed), this);
     }
 
     static int session_count = 0;
@@ -230,7 +230,7 @@ bool WebRTC::initialize(Promise *promise)
                                      std::to_string(session_count);
         video_joint_ = make_pipe_joint(media_type, pipejoint_name);
 
-        app()->add_pipe_joint(video_joint_.upstream_joint);
+        app()->add_pipe_joint(video_joint_.upstream_joint, video_joint_.downstream_joint);
 
         g_warn_if_fail(gst_bin_add(GST_BIN(pipeline_), video_joint_.downstream_joint));
 
@@ -246,7 +246,7 @@ bool WebRTC::initialize(Promise *promise)
                                      std::to_string(session_count);
         audio_joint_ = make_pipe_joint(media_type, pipejoint_name);
 
-        app()->add_pipe_joint(audio_joint_.upstream_joint);
+        app()->add_pipe_joint(audio_joint_.upstream_joint, audio_joint_.downstream_joint);
 
         g_warn_if_fail(gst_bin_add(GST_BIN(pipeline_), audio_joint_.downstream_joint));
 
@@ -272,11 +272,11 @@ void WebRTC::terminate()
     // dynamicly unlink
     if (!app()->video_encoding().empty() &&
         video_joint_.upstream_joint != NULL) {
-        app()->remove_pipe_joint(video_joint_.upstream_joint);
+        app()->remove_pipe_joint(video_joint_.upstream_joint, video_joint_.downstream_joint);
     }
     if (!app()->audio_encoding().empty() &&
         audio_joint_.upstream_joint != NULL) {
-        app()->remove_pipe_joint(audio_joint_.upstream_joint);
+        app()->remove_pipe_joint(audio_joint_.upstream_joint, audio_joint_.downstream_joint);
     }
     if (pipeline_) {
         gst_element_set_state(GST_ELEMENT(pipeline_), GST_STATE_NULL);

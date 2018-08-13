@@ -24,23 +24,24 @@ class WebStreamer;
 class IApp
 {
  public:
-    IApp(const std::string& name, WebStreamer* ws)
+    IApp(const std::string &name, WebStreamer *ws)
         : name_(name)
         , pipeline_(NULL)
         , webstreamer_(ws)
 
-    {}
-    virtual ~IApp(){}
+    {
+    }
+    virtual ~IApp() {}
 
-    virtual bool Initialize(Promise* promise);
+    virtual bool Initialize(Promise *promise);
     /*
      * return false if the destroy not complete
     */
-    virtual bool Destroy(Promise* promise);
+    virtual bool Destroy(Promise *promise);
 
-    virtual void On(Promise* promise) = 0;
+    virtual void On(Promise *promise) = 0;
 
-    virtual const char* type() const = 0;
+    virtual const char *type() const = 0;
     virtual std::string uname() = 0;
 
     virtual void Notify(const nlohmann::json &data, const nlohmann::json &meta);
@@ -52,24 +53,25 @@ class IApp
     const std::string &audio_encoding() const { return audio_encoding_; }
     std::string &audio_encoding() { return audio_encoding_; }
 
-    virtual void add_pipe_joint(GstElement *upstream_joint) {}
-    virtual void remove_pipe_joint(GstElement *upstream_joint) {}
+    virtual void add_pipe_joint(GstElement *upstream_joint, GstElement *downstream_joint) {}
+    virtual void remove_pipe_joint(GstElement *upstream_joint, GstElement *downstream_joint) {}
 
  protected:
     std::string name_;
-    GstElement* pipeline_;
-    WebStreamer* webstreamer_;
+    GstElement *pipeline_;
+    WebStreamer *webstreamer_;
 
     std::string video_encoding_;
     std::string audio_encoding_;
 };
 
 #define APP(klass)                               \
-    static const char* CLASS_NAME() {            \
+    static const char *CLASS_NAME()              \
+    {                                            \
         return #klass;                           \
     };                                           \
                                                  \
-    const char* type() const                     \
+    const char *type() const                     \
     {                                            \
         return CLASS_NAME();                     \
     }                                            \
