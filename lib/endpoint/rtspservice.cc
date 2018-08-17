@@ -223,7 +223,8 @@ void IRTSPService::on_rtsp_media_constructed(GstRTSPMediaFactory *factory, GstRT
                                      std::to_string(session_count);
         rtspserver->video_joint_ = make_pipe_joint(media_type, pipejoint_name);
 
-        rtspserver->app()->add_pipe_joint(rtspserver->video_joint_.upstream_joint, rtspserver->video_joint_.downstream_joint);
+        rtspserver->app()->add_pipe_joint(rtspserver->video_joint_.upstream_joint,
+                                          rtspserver->video_joint_.downstream_joint);
 
         g_warn_if_fail(gst_bin_add(GST_BIN(rtsp_server_media_bin), rtspserver->video_joint_.downstream_joint));
 
@@ -244,7 +245,8 @@ void IRTSPService::on_rtsp_media_constructed(GstRTSPMediaFactory *factory, GstRT
                                      std::to_string(session_count);
         rtspserver->audio_joint_ = make_pipe_joint(media_type, pipejoint_name);
 
-        rtspserver->app()->add_pipe_joint(rtspserver->audio_joint_.upstream_joint, rtspserver->audio_joint_.downstream_joint);
+        rtspserver->app()->add_pipe_joint(rtspserver->audio_joint_.upstream_joint,
+                                          rtspserver->audio_joint_.downstream_joint);
 
         g_warn_if_fail(gst_bin_add(GST_BIN(rtsp_server_media_bin), rtspserver->audio_joint_.downstream_joint));
 

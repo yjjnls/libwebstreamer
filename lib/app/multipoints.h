@@ -20,26 +20,6 @@
 #include <framework/app.h>
 #include <mutex>  // NOLINT
 
-// #define USE_AUTO_SINK 1
-struct sink_link
-{
-    GstElement *joint;
-    GstPad *request_pad;
-    void *pipeline;
-    gboolean video_probe_invoke_control;
-    gboolean audio_probe_invoke_control;
-    bool is_output;
-
-    sink_link(GstPad *pad, GstElement *joint_element, void *pipe, bool output = true)
-        : joint(joint_element)
-        , request_pad(pad)
-        , pipeline(pipe)
-        , video_probe_invoke_control(FALSE)
-        , audio_probe_invoke_control(FALSE)
-        , is_output(output)
-    {
-    }
-};
 class WebStreamer;
 class MultiPoints : public IApp
 {
@@ -48,10 +28,9 @@ class MultiPoints : public IApp
 
     MultiPoints(const std::string &name, WebStreamer *ws);
     ~MultiPoints();
-    void link_stream_output_joint(GstElement *upstream_joint);
-    void remove_stream_output_joint(GstElement *upstream_joint);
-    void link_stream_input_joint(GstElement *downstream_joint);
-    void remove_stream_input_joint(GstElement *downstream_joint);
+
+    virtual void add_pipe_joint(GstElement *upstream_joint, GstElement *downstream_joint);
+    virtual void remove_pipe_joint(GstElement *upstream_joint, GstElement *downstream_joint);
 
     virtual void On(Promise *promise);
     virtual bool Initialize(Promise *promise);
@@ -61,8 +40,8 @@ class MultiPoints : public IApp
     void Startup(Promise *promise);
     void Stop(Promise *promise);
     void add_member(Promise *promise);
-    void set_speaker(Promise *promise);
     void remove_member(Promise *promise);
+    void set_speaker(Promise *promise);
     void set_remote_description(Promise *promise);
     void set_remote_candidate(Promise *promise);
 
@@ -70,6 +49,10 @@ class MultiPoints : public IApp
     virtual bool MessageHandler(GstMessage *msg);
 
  private:
+    void link_stream_output_joint(GstElement *upstream_joint);
+    void remove_stream_output_joint(GstElement *upstream_joint);
+    void link_stream_input_joint(GstElement *downstream_joint);
+    void remove_stream_input_joint(GstElement *downstream_joint);
     static GstPadProbeReturn
     on_request_pad_remove_video_probe(GstPad *pad,
                                       GstPadProbeInfo *probe_info,
@@ -84,6 +67,7 @@ class MultiPoints : public IApp
                                              GstPadProbeInfo *info,
                                              gpointer user_data);
     std::list<IEndpoint *>::iterator find_member(const std::string &name);
+    void set_speaker_default();
 
 
     GstElement *video_tee_;
@@ -92,7 +76,8 @@ class MultiPoints : public IApp
     GstElement *audio_selector_;
     GstElement *default_video_src_;
     GstElement *default_audio_src_;
-    std::list<WebRTC *> members_;
+    GstElement *bin_;
+    std::list<IEndpoint *> members_;
     IEndpoint *speaker_;
 
     std::list<sink_link *> tee_sinks_;  // all the request pad of tee,

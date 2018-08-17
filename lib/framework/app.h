@@ -20,7 +20,28 @@
 
 
 #include "endpoint.h"
+#define USE_VP8 1
+// #define USE_H264 1
 class WebStreamer;
+struct sink_link
+{
+    GstElement *joint;
+    GstPad *request_pad;
+    void *pipeline;
+    gboolean video_probe_invoke_control;
+    gboolean audio_probe_invoke_control;
+    bool is_output;
+
+    sink_link(GstPad *pad, GstElement *joint_element, void *pipe, bool output = true)
+        : joint(joint_element)
+        , request_pad(pad)
+        , pipeline(pipe)
+        , video_probe_invoke_control(FALSE)
+        , audio_probe_invoke_control(FALSE)
+        , is_output(output)
+    {
+    }
+};
 class IApp
 {
  public:

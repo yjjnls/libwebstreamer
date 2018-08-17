@@ -36,6 +36,11 @@ class WebRTC : public IEndpoint
     GstElement *pipeline() { return pipeline_; }
     std::string &launch() { return launch_; }
 
+    GstElement *video_output_pipejoint() { return video_output_joint_.upstream_joint; }
+    GstElement *video_input_pipejoint() { return video_input_joint_.downstream_joint; }
+    GstElement *audio_output_pipejoint() { return audio_output_joint_.upstream_joint; }
+    GstElement *audio_input_pipejoint() { return audio_input_joint_.downstream_joint; }
+
  private:
     static void on_ice_candidate(GstElement *webrtc G_GNUC_UNUSED,
                                  guint mlineindex,
@@ -45,6 +50,9 @@ class WebRTC : public IEndpoint
     static void on_negotiation_needed(GstElement *element, gpointer user_data);
     static void on_webrtc_pad_added(GstElement *webrtc, GstPad *new_pad, gpointer user_data);
 
+    static GstPadProbeReturn on_monitor_data(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
+
+
 
     bool add_to_pipeline();
 
@@ -52,8 +60,10 @@ class WebRTC : public IEndpoint
     GstElement *bin_;
     GstElement *webrtc_;
 
-    PipeJoint video_joint_;
-    PipeJoint audio_joint_;
+    PipeJoint video_input_joint_;
+    PipeJoint video_output_joint_;
+    PipeJoint audio_input_joint_;
+    PipeJoint audio_output_joint_;
     std::string role_;
     std::string launch_;
 };

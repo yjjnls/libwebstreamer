@@ -70,15 +70,15 @@ bool LiveStream::Destroy(Promise *promise)
     }
     if (!sinks_.empty()) {
         for (auto info : sinks_) {
-            GstElement *upstream_joint = info->upstream_joint;
+            GstElement *upstream_joint = info->joint;
             LiveStream *pipeline = static_cast<LiveStream *>(info->pipeline);
 
             // remove pipeline dynamicly
             g_warn_if_fail(gst_bin_remove(GST_BIN(pipeline->pipeline()), upstream_joint));
             gst_element_unlink(pipeline->video_tee_, upstream_joint);
 
-            gst_element_release_request_pad(pipeline->video_tee_, info->tee_pad);
-            gst_object_unref(info->tee_pad);
+            gst_element_release_request_pad(pipeline->video_tee_, info->request_pad);
+            gst_object_unref(info->request_pad);
             delete info;
         }
     }
@@ -447,18 +447,18 @@ GstPadProbeReturn LiveStream::on_tee_pad_remove_video_probe(GstPad *teepad, GstP
         return GST_PAD_PROBE_OK;
     }
 
-    GstElement *upstream_joint = info->upstream_joint;
+    GstElement *upstream_joint = info->joint;
     LiveStream *pipeline = static_cast<LiveStream *>(info->pipeline);
 
     // remove pipeline dynamicaly
     GstPad *sinkpad = gst_element_get_static_pad(upstream_joint, "sink");
-    gst_pad_unlink(info->tee_pad, sinkpad);
+    gst_pad_unlink(info->request_pad, sinkpad);
     gst_object_unref(sinkpad);
     gst_element_set_state(upstream_joint, GST_STATE_NULL);
     g_warn_if_fail(gst_bin_remove(GST_BIN(pipeline->pipeline()), upstream_joint));
 
-    gst_element_release_request_pad(pipeline->video_tee_, info->tee_pad);
-    gst_object_unref(info->tee_pad);
+    gst_element_release_request_pad(pipeline->video_tee_, info->request_pad);
+    gst_object_unref(info->request_pad);
     delete static_cast<sink_link *>(data);
     GST_DEBUG("[livestream] remove video joint from tee pad");
     return GST_PAD_PROBE_REMOVE;
@@ -470,18 +470,18 @@ GstPadProbeReturn LiveStream::on_tee_pad_remove_audio_probe(GstPad *pad, GstPadP
         return GST_PAD_PROBE_OK;
     }
 
-    GstElement *upstream_joint = info->upstream_joint;
+    GstElement *upstream_joint = info->joint;
     LiveStream *pipeline = static_cast<LiveStream *>(info->pipeline);
 
     // remove pipeline dynamicaly
     GstPad *sinkpad = gst_element_get_static_pad(upstream_joint, "sink");
-    gst_pad_unlink(info->tee_pad, sinkpad);
+    gst_pad_unlink(info->request_pad, sinkpad);
     gst_object_unref(sinkpad);
     gst_element_set_state(upstream_joint, GST_STATE_NULL);
     g_warn_if_fail(gst_bin_remove(GST_BIN(pipeline->pipeline()), upstream_joint));
 
-    gst_element_release_request_pad(pipeline->audio_tee_, info->tee_pad);
-    gst_object_unref(info->tee_pad);
+    gst_element_release_request_pad(pipeline->audio_tee_, info->request_pad);
+    gst_object_unref(info->request_pad);
     delete static_cast<sink_link *>(data);
     GST_DEBUG("[livestream] remove audio joint from tee pad");
     return GST_PAD_PROBE_REMOVE;
@@ -493,7 +493,7 @@ void LiveStream::remove_stream_output_joint(GstElement *upstream_joint)
     if (g_str_equal(media_type, "video")) {
         auto it = sinks_.begin();
         for (; it != sinks_.end(); ++it) {
-            if ((*it)->upstream_joint == upstream_joint) {
+            if ((*it)->joint == upstream_joint) {
                 break;
             }
         }
@@ -503,13 +503,13 @@ void LiveStream::remove_stream_output_joint(GstElement *upstream_joint)
             return;
         }
         (*it)->video_probe_invoke_control = TRUE;
-        gst_pad_add_probe((*it)->tee_pad, GST_PAD_PROBE_TYPE_IDLE, on_tee_pad_remove_video_probe, *it, NULL);
+        gst_pad_add_probe((*it)->request_pad, GST_PAD_PROBE_TYPE_IDLE, on_tee_pad_remove_video_probe, *it, NULL);
         sinks_.erase(it);
         GST_DEBUG("[livestream] remove video joint completed");
     } else if (g_str_equal(media_type, "audio")) {
         auto it = sinks_.begin();
         for (; it != sinks_.end(); ++it) {
-            if ((*it)->upstream_joint == upstream_joint) {
+            if ((*it)->joint == upstream_joint) {
                 break;
             }
         }
@@ -519,7 +519,7 @@ void LiveStream::remove_stream_output_joint(GstElement *upstream_joint)
             return;
         }
         (*it)->audio_probe_invoke_control = TRUE;
-        gst_pad_add_probe((*it)->tee_pad, GST_PAD_PROBE_TYPE_IDLE, on_tee_pad_remove_audio_probe, *it, NULL);
+        gst_pad_add_probe((*it)->request_pad, GST_PAD_PROBE_TYPE_IDLE, on_tee_pad_remove_audio_probe, *it, NULL);
         sinks_.erase(it);
         GST_DEBUG("[livestream] remove audio joint completed");
     }
